@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login / Contact Page</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../reset.css"> <!-- CSS reset -->
+    <link rel="stylesheet" href="../style.css"> <!-- Main style -->
+    <link rel="stylesheet" href="../contact.css"> <!-- Contact form style -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="../js/modernizr.js"></script>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <ul class="cd-primary-nav">
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="bookin.html">BOOK NOW</a></li>
+            <li><a href="login.html">ACCOUNT</a></li>
+            <li><a href="payment.html">Pending Payment</a></li>
+            <li><a href="contact.html">CONTACT US</a></li>
+        </ul>
+    </nav>
+
+    <!-- Menu trigger (optional) -->
+    <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
+
+    <div class="cd-overlay-nav"><span></span></div>
+    <div class="cd-overlay-content"><span></span></div>
+
+    <!-- Page Content -->
+    <div id="content">
+        <h1>Contact</h1>
+        <div class="formm">
+            <form action="#" method="post" autocomplete="on">
+                <p>
+                    <label for="username" class="icon-user"> Name <span class="required">*</span></label>
+                    <input type="text" name="username" id="username" required placeholder="Your Name" />
+                </p>
+
+                <p>
+                    <label for="usermail" class="icon-envelope"> E-mail address <span class="required">*</span></label>
+                    <input type="email" name="usermail" id="usermail" required placeholder="I promise I hate spam too!" />
+                </p>
+
+                <p>
+                    <label for="subject" class="icon-bullhorn"> Subject</label>
+                    <input type="text" name="subject" id="subject" placeholder="What would you like to talk about?" />
+                </p>
+
+                <p>
+                    <label for="message" class="icon-comment"> Message <span class="required">*</span></label>
+                    <textarea name="message" required placeholder="Your message here and I'll answer as soon as possible"></textarea>
+                </p>
+
+                <p class="indication">Fields with <span class="required">*</span> are required</p>
+                <input type="submit" value="Send this mail!" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Optional Decorative Elements -->
+    <div class="container">
+        <div id="cloud-intro"></div>
+    </div>
+
+    <div class="svgg"></div>
+    <div class="frame">
+        <div class="frame__title-wrap"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/jquery-2.1.1.js"></script>
+    <script src="../js/velocity.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/contact.js"></script>
+    <script src="../js/bookin.js"></script>
+
+</body>
+</html>
