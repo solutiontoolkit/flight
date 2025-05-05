@@ -20,6 +20,7 @@ def booking():
     if 'user_id' not in session:
         return redirect(url_for('account'))  # Force login before booking
     return render_template('bookin.html')
+    
 
 
 @app.route('/')
@@ -39,6 +40,15 @@ def payment():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+
+@app.route('/signup')
+def signup():
+    return render_template('login.html')
+
+@app.route('/login')
+def login():
+    return render_template('/login.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

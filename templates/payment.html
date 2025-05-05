@@ -1,128 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Payment</title>
 
-  
-<!-- Correct way to include CSS in Flask -->
-<link rel="stylesheet" href="{{ url_for('static', filename='paymen.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='backijacki.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/paymen.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/backijacki.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
   <script>document.documentElement.className = 'js';</script>
-  
+  <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
 </head>
 
 <body>
 
-<div class="demo-5">
-  <div class="content">
-    <canvas id="scene"></canvas>
-  </div>
-</div>
-
-<div class="main--container">
-  <div class="card--container">
-    <div class="card _front">
-      <div class="front_top">
-        <div class="top_chip">
-          <img src="{{ url_for('static', filename='img/chip-card.png') }}" alt="credit card chip" />
-        </div>
-        <div class="top_logo">
-          <img src="{{ url_for('static', filename='img/visa_logo.png') }}" alt="credit card logo" />
-        </div>
-      </div>
-      <div class="front_middle">
-        <div class="cardNumber"></div>
-      </div>
-      <div class="front_bottom">
-        <div class="bottom_name"><span>Card Holder:</span><br /><span class="cardName"></span></div>
-        <div class="bottom_expiration">
-          <span>Expires:</span><br /><span class="cardDate"><span class="month">MM</span>/<span class="year">YY</span></span>
-        </div>
-      </div>
-    </div>
-    <div class="card _back">
-      <div class="strip"></div>
-      <div class="strip"><span class="cardCvv"></span></div>
+  <div class="demo-5">
+    <div class="content">
+      <canvas id="scene"></canvas>
     </div>
   </div>
 
-  <div class="form-container">
-    <form class="form" action="/">
-      <div class="form--input">
-        <label class="form--input_label" for="number">Card Number</label>
-        <span class="form--input__invalid-info">Provide valid card number!</span>
-        <input class="form--input_input" type="text" name="number" id="number" maxlength=16 />
-      </div>
-
-      <div class="form--input">
-        <label class="form--input_label" for="name">Cardholder name</label>
-        <input class="form--input_input" type="text" name="name" id="name" />
-      </div>
-
-      <div class="form--row">
-        <div class="form--col -date">
-          <label class="form--input_label" for="date">Expiration Date</label>
-          <select class="form--input_input _select" name="date--month" id="month">
-            <option value="Month" disabled selected>Month</option>
-            {% for m in range(1, 13) %}
-              <option value="{{ '%02d' % m }}">{{ m }}</option>
-            {% endfor %}
-          </select>
-          <select class="form--input_input _select" name="date--year" id="year">
-            <option value="Year" disabled selected>Year</option>
-            {% for y in range(2024, 2031) %}
-              <option value="{{ y }}">{{ y }}</option>
-            {% endfor %}
-          </select>
+  <div class="main--container">
+    <div class="card--container">
+      <div class="card _front">
+        <div class="front_top">
+          <div class="top_chip">
+            <img src="{{ url_for('static', filename='img/chip-card.png') }}" alt="credit card chip" />
+          </div>
+          <div class="top_logo">
+            <img src="{{ url_for('static', filename='img/visa_logo.png') }}" alt="credit card logo" />
+          </div>
         </div>
-
-        <div class="form--col -cvv">
-          <div class="form--input">
-            <label class="form--input_label" for="cvv">CVV</label>
-            <input class="form--input_input" type="text" name="cvv" id="cvv" maxlength=4 />
+        <div class="front_middle">
+          <div class="cardNumber"></div>
+        </div>
+        <div class="front_bottom">
+          <div class="bottom_name"><span>Card Holder:</span><br /><span class="cardName"></span></div>
+          <div class="bottom_expiration">
+            <span>Expires:</span><br /><span class="cardDate"><span class="month">MM</span>/<span class="year">YY</span></span>
           </div>
         </div>
       </div>
+      <div class="card _back">
+        <div class="strip"></div>
+        <div class="strip"><span class="cardCvv"></span></div>
+      </div>
+    </div>
 
-      <button class="form--button" type="submit" disabled>
-        <a href="{{ url_for('home') }}">Submit</a>
-      </button>
-    </form>
+    <div class="form-container">
+      <form class="form" action="/">
+        <div class="form--input">
+          <label class="form--input_label" for="number">Card Number</label>
+          <span class="form--input__invalid-info">Provide valid card number!</span>
+          <input class="form--input_input" type="text" name="number" id="number" maxlength="16" />
+        </div>
+
+        <div class="form--input">
+          <label class="form--input_label" for="name">Cardholder name</label>
+          <input class="form--input_input" type="text" name="name" id="name" />
+        </div>
+
+        <div class="form--row">
+          <div class="form--col -date">
+            <label class="form--input_label" for="date">Expiration Date</label>
+            <select class="form--input_input _select" name="date--month" id="month">
+              <option value="Month" disabled selected>Month</option>
+              {% for i in range(1, 13) %}
+              <option value="{{ '%02d' % i }}">{{ i }}</option>
+              {% endfor %}
+            </select>
+            <select class="form--input_input _select" name="date--year" id="year">
+              <option value="Year" disabled selected>Year</option>
+              {% for year in range(2024, 2031) %}
+              <option value="{{ year }}">{{ year }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form--col -cvv">
+            <div class="form--input">
+              <label class="form--input_label" for="cvv">CVV</label>
+              <input class="form--input_input" type="text" name="cvv" id="cvv" maxlength="4" />
+            </div>
+          </div>
+        </div>
+
+        <button class="form--button" type="submit" disabled>
+          <a href="{{ url_for('home') }}">Submit</a>
+        </button>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Navigation -->
-<nav>
-  <ul class="cd-primary-nav">
-    <li><a href="{{ url_for('home') }}">HOME</a></li>
-    <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
-    <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
-    <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-    <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
-    <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
-  </ul>
+  <nav>
+    <ul class="cd-primary-nav">
+      <li><a href="{{ url_for('home') }}">HOME</a></li>
+      <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+      <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+      <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+      <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+    </ul>
   </nav>
 
-<div class="cd-overlay-nav"><span></span></div>
-<div class="cd-overlay-content"><span></span></div>
-<a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
+  <div class="cd-overlay-nav"><span></span></div>
+  <div class="cd-overlay-content"><span></span></div>
+  <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
 
-<!-- JS Files -->
-<script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendors/three.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendors/perlin.js') }}"></script>
-<script src="{{ url_for('static', filename='js/backijacki.js') }}"></script>
-<script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
-<script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/paymen.js') }}"></script>
+  <div class="svgg"></div>
+
+  <script src="{{ url_for('static', filename='js/vendors/three.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vendors/perlin.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/backijacki.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/paymen.js') }}"></script>
 </body>
+
 </html>
