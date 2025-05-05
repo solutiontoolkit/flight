@@ -1,165 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Payment</title>
-  <link rel="stylesheet" href="../paymen.css" />
-  <link rel="stylesheet" href="../normalize.css" />
-  <link rel="stylesheet" href="../backijacki.css" />
-  <link rel="stylesheet" href="../reset.css" />
-  <link rel="stylesheet" href="../style.css" />
+
+  
+<!-- Correct way to include CSS in Flask -->
+<link rel="stylesheet" href="{{ url_for('static', filename='paymen.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='backijacki.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 
   <script>document.documentElement.className = 'js';</script>
-
-  <script src="js/modernizr.js"></script> <!-- Modernizr -->
-
-
+  
 </head>
 
 <body>
 
-    <div class="demo-5">
-    <div class="content">
-        <!-- The canvas where ThreeJs renders the WebGL -->
-        <canvas id="scene"></canvas>
-    </div>
-    </div>
-    
-  <div class="main--container">
-    <div class="card--container">
-      <div class="card _front">
-        <div class="front_top">
-          <div class="top_chip">
-            <img src="../img/chip-card.png" alt="credit card chip" />
-          </div>
-          <div class="top_logo">
-            <img src="../img/visa_logo.png" alt="credit card logo" />
-          </div>
+<div class="demo-5">
+  <div class="content">
+    <canvas id="scene"></canvas>
+  </div>
+</div>
+
+<div class="main--container">
+  <div class="card--container">
+    <div class="card _front">
+      <div class="front_top">
+        <div class="top_chip">
+          <img src="{{ url_for('static', filename='img/chip-card.png') }}" alt="credit card chip" />
         </div>
-        <div class="front_middle">
-          <div class="cardNumber"></div>
-        </div>
-        <div class="front_bottom">
-          <div class="bottom_name"><span>Card Holder:</span><br /><span class="cardName"></span></div>
-          <div class="bottom_expiration">
-            <span>Expires:</span><br /><span class="cardDate"><span class="month">MM</span>/<span
-                class="year">YY</span></span>
-          </div>
+        <div class="top_logo">
+          <img src="{{ url_for('static', filename='img/visa_logo.png') }}" alt="credit card logo" />
         </div>
       </div>
-      <div class="card _back">
-        <div class="strip"></div>
-        <div class="strip"><span class="cardCvv"></span></div>
+      <div class="front_middle">
+        <div class="cardNumber"></div>
+      </div>
+      <div class="front_bottom">
+        <div class="bottom_name"><span>Card Holder:</span><br /><span class="cardName"></span></div>
+        <div class="bottom_expiration">
+          <span>Expires:</span><br /><span class="cardDate"><span class="month">MM</span>/<span class="year">YY</span></span>
+        </div>
       </div>
     </div>
-    <div class="form-container">
-      <form class="form" action="/">
-        <div class="form--input">
-          <label class="form--input_label" for="number">Card Number</label>
-          <span class="form--input__invalid-info">Provide valid card number!</span>
-          <input class="form--input_input" type="text" name="number" id="number" maxlength=16 />
-        </div>
-
-        <div class="form--input">
-          <label class="form--input_label" for="name">Cardholder name</label>
-          <input class="form--input_input" type="text" name="name" id="name" />
-        </div>
-
-        <div class="form--row">
-          <div class="form--col -date">
-            <label class="form--input_label" for="date">Expiration Date</label>
-            <select class="form--input_input _select" name="date--month" id="month">
-              <option value="Month" disabled selected>Month</option>
-              <option value="01">1</option>
-              <option value="02">2</option>
-              <option value="03">3</option>
-              <option value="04">4</option>
-              <option value="05">5</option>
-              <option value="06">6</option>
-              <option value="07">7</option>
-              <option value="08">8</option>
-              <option value="09">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-            <select class="form--input_input _select" name="date--year" id="year" class="date--year">
-              <option value="Year" disabled selected>Year</option>
-              <option value="2019">2019</option>
-              <option value="2020">2020</option>
-              <option value="2021">2021</option>
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
-              <option value="2029">2029</option>
-              <option value="2030">2030</option>
-            </select>
-          </div>
-
-          <div class="form--col -cvv">
-            <div class="form--input">
-              <label class="form--input_label" for="cvv">CVV</label>
-              <input class="form--input_input" type="text" name="cvv" id="cvv" maxlength=4 />
-            </div>
-          </div>
-        </div>
-
-        <button class="form--button" type="submit" disabled>
-        <a href="home.html">
-            Submit
-        </a>    
-        </button>
-      </form>
+    <div class="card _back">
+      <div class="strip"></div>
+      <div class="strip"><span class="cardCvv"></span></div>
     </div>
   </div>
 
-  <nav>
-    <ul class="cd-primary-nav">
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="bookin.html">BOOK NOW</a></li>
-        <li><a href="login.html">ACCOUNT</a></li>
-        <li><a href="payment.html">Pending Payment</a></li>
-        <li><a href="contact.html">CONTACT US</a></li>
-    </ul>
-</nav>
+  <div class="form-container">
+    <form class="form" action="/">
+      <div class="form--input">
+        <label class="form--input_label" for="number">Card Number</label>
+        <span class="form--input__invalid-info">Provide valid card number!</span>
+        <input class="form--input_input" type="text" name="number" id="number" maxlength=16 />
+      </div>
 
+      <div class="form--input">
+        <label class="form--input_label" for="name">Cardholder name</label>
+        <input class="form--input_input" type="text" name="name" id="name" />
+      </div>
 
-<div class="cd-overlay-nav">
-    <span></span>
-</div> <!-- cd-overlay-nav -->
+      <div class="form--row">
+        <div class="form--col -date">
+          <label class="form--input_label" for="date">Expiration Date</label>
+          <select class="form--input_input _select" name="date--month" id="month">
+            <option value="Month" disabled selected>Month</option>
+            {% for m in range(1, 13) %}
+              <option value="{{ '%02d' % m }}">{{ m }}</option>
+            {% endfor %}
+          </select>
+          <select class="form--input_input _select" name="date--year" id="year">
+            <option value="Year" disabled selected>Year</option>
+            {% for y in range(2024, 2031) %}
+              <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-<div class="cd-overlay-content">
-    <span></span>
-</div> <!-- cd-overlay-content -->
+        <div class="form--col -cvv">
+          <div class="form--input">
+            <label class="form--input_label" for="cvv">CVV</label>
+            <input class="form--input_input" type="text" name="cvv" id="cvv" maxlength=4 />
+          </div>
+        </div>
+      </div>
 
-<a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
-
-<div class="svgg">
-
-    <!-- logo div -->
-    </svg>
-
-
+      <button class="form--button" type="submit" disabled>
+        <a href="{{ url_for('home') }}">Submit</a>
+      </button>
+    </form>
+  </div>
 </div>
 
+<!-- Navigation -->
+<nav>
+  <ul class="cd-primary-nav">
+    <li><a href="{{ url_for('home') }}">HOME</a></li>
+    <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+    <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+    <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+    <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+    <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+  </ul>
+  </nav>
 
+<div class="cd-overlay-nav"><span></span></div>
+<div class="cd-overlay-content"><span></span></div>
+<a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
 
-<script src="../js/modernizr.js"></script>
-<script src="../js/vendors/three.min.js"></script>
-<script src="../js/vendors/perlin.js"></script>
-<script src="../js/backijacki.js"></script>
-<script src="../js/jquery-2.1.1.js"></script>
-<script src="../js/velocity.min.js"></script>
-<script src="../js/main.js"></script>
-<script src="../js/paymen.js"></script>
+<!-- JS Files -->
+<script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendors/three.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendors/perlin.js') }}"></script>
+<script src="{{ url_for('static', filename='js/backijacki.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/paymen.js') }}"></script>
 </body>
-
 </html>

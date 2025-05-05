@@ -7,3 +7,6 @@ what its been used to script in the project...
 <link rel="stylesheet" type="text/css" href="templates/demo.css" /> demo for text
 
 
+.\venv\Scripts\Activate.ps1 ----- powershell venv activation
+
+

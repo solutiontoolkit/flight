@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login / Contact Page</title>
+    <title>Contact Page</title>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="../reset.css"> <!-- CSS reset -->
-    <link rel="stylesheet" href="../style.css"> <!-- Main style -->
-    <link rel="stylesheet" href="../contact.css"> <!-- Contact form style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='contact.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
     <link href="https://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
     
     <!-- Scripts -->
-    <script src="../js/modernizr.js"></script>
+    <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
 </head>
 <body>
 
     <!-- Navigation -->
     <nav>
-        <ul class="cd-primary-nav">
-            <li><a href="index.html">HOME</a></li>
-            <li><a href="bookin.html">BOOK NOW</a></li>
-            <li><a href="login.html">ACCOUNT</a></li>
-            <li><a href="payment.html">Pending Payment</a></li>
-            <li><a href="contact.html">CONTACT US</a></li>
-        </ul>
-    </nav>
-
-    <!-- Menu trigger (optional) -->
+		<ul class="cd-primary-nav">
+		  <li><a href="{{ url_for('home') }}">HOME</a></li>
+		  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+		  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+		  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+		  <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+		  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+		</ul>
+	  </nav>
+    <!-- Optional Menu Trigger -->
     <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
 
     <div class="cd-overlay-nav"><span></span></div>
@@ -76,11 +76,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../js/jquery-2.1.1.js"></script>
-    <script src="../js/velocity.min.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../js/contact.js"></script>
-    <script src="../js/bookin.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/contact.js') }}"></script>
+
 
 </body>
 </html>

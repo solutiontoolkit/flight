@@ -1,166 +1,121 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
-	<head>
+<head>
+    <meta charset="UTF-8">
+    <title>Book a Flight</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bookin.css') }}">
+    <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
+</head>
+<body>
 
-    <link rel="stylesheet" href="../reset.css">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../bookin.css">
-    <script src="../js/modernizr.js"></script>
-    
+    <div class="container">
+        <div id="cloud-intro"></div>
+    </div>
 
-        </head>
-	<body>
+    <form action="{{ url_for('login') }}" method="post" class="trip-form">
+        <!-- Trip type selection -->
+        <fieldset class="radio-group">
+            <label><input type="radio" name="trip-type" value="oneWay"> One Way</label>
+            <label><input type="radio" name="trip-type" value="roundTrip" checked> Round trip</label>
+            <label><input type="radio" name="trip-type" value="multiCity"> Multi City</label>
+        </fieldset>
 
-        <div class="container">
-            <div id="cloud-intro"></div>
-          </div>
-
-		   <div class="svgg">
-
-		</svg>
-					<!-- logo div -->
-
-           </div>
-
-
-           <form action="" method="post" class="trip-form">
-            <fieldset class="radio-group">
-             <label for="one-way" class="bold-type">
-               <input type="radio" id="one-way" name="trip-type" value="oneWay" />
-               One Way 
-            </label>
-            <label for="round-trip" class="bold-type">
-              <input type="radio" id="round-trip" name="trip-type" value="roundTrip" checked="checked" />
-              Round trip
-            </label>
-            <label for="multi-city" class="bold-type">
-              <input type="radio" id="multi-city" name="trip-type" value="multiCity" />
-              Multi City
-            </label>
-          </fieldset>
-            
-            <fieldset>
-              <div class="group-field">
-                <label for="from" class="bold-type">From </label>
-                <input class="from-place" type="text" name="from" maxlength="100" placeholder="Any world wide city or airport">
-              </div>
-              <div class="group-field">
-                <label for="to" class="bold-type">To </label>
-                <input class="to-place" type="text" name="to"  maxlength="100" placeholder="Any world wide city or airport">
-              </div>
-            </fieldset>
-            <fieldset>
-              <div class="group-field">
-                <label for="depart" class="bold-type">Depart on</label>
-                <input placeholder="Pick a date" type="date" name="depart" />
-              </div>
-              <div class="group-field">
-                <label for="return" class="bold-type">Return on</label>
-                <input placeholder="Pick a date" type="date" name="return" />
-              </div>
-            </fieldset>
-            
-            <fieldset>
-              <div class="group-select-field">
-                <label for="adults" class="bold-type">Adults</label> 
-                <select name="adults" class="ticket-count">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">3</option>
-                  <option value="5">3</option>
-                </select>
-              </div>
-               <div class="group-select-field">
-                <label for="children">Children</label>
-                 <select name="children" class="ticket-count">
-                   <option value="0">0</option>
-                   <option value="1">1</option>
-                   <option value="2">2</option>
-                   <option value="3">3</option>
-                   <option value="4">3</option>
-                   <option value="5">3</option>
-                 </select>
-                 <label class="label-hint"> 2&hyphen;11 years</label>
-              </div>
-               <div class="group-select-field">
-                <label for="infants">Infants</label>
-                 <select name="children" class="ticket-count">
-                   <option value="0">0</option>
-                   <option value="1">1</option>
-                   <option value="2">2</option>
-                   <option value="3">3</option>
-                   <option value="4">3</option>
-                   <option value="5">3</option>
-                 </select>
-                 <label class="label-hint">Below 2 yrs</label>
-              </div>
-            </fieldset>
-            <fieldset class="more-option">
-              <details>
-                <summary class="more-link"> <b>More options: </b>Class of travel, Airline Preference</summary>
-                 <div class="group-field">
-                <label for="class-of-travel">Class of travel</label>
-                <select name="class-of-travel" class="travel-class-select">
-                  <option value="economy">Economy</option>
-                  <option value="business">Business class</option>
-                  <option value="firstClass">First class</option>
-                </select>
-              </div>
-              <div class="group-field">
-                <label for="airline-name">Preferred Airline</label> 
-                <input class="airline-name" type="text" name="airline-name" size="30" maxlength="100" placeholder="Airline name"/> 
-              </div>
-            </details> 
-            </fieldset>
-			<button class="search-btn">
-			<a href="login.html">
-		search flight
-		</a>
-		</button>
-          </form>
-
-          <div class="frame">
-            <div class="frame__title-wrap">
+        <!-- From and To -->
+        <fieldset>
+            <div class="group-field">
+                <label>From</label>
+                <input type="text" name="from" placeholder="Any city or airport">
             </div>
-        </div>
+            <div class="group-field">
+                <label>To</label>
+                <input type="text" name="to" placeholder="Any city or airport">
+            </div>
+        </fieldset>
 
+        <!-- Dates -->
+        <fieldset>
+            <div class="group-field">
+                <label>Depart on</label>
+                <input type="date" name="depart">
+            </div>
+            <div class="group-field">
+                <label>Return on</label>
+                <input type="date" name="return">
+            </div>
+        </fieldset>
 
+        <!-- Passengers -->
+        <fieldset>
+            <div class="group-select-field">
+                <label>Adults</label>
+                <select name="adults">
+                    {% for i in range(1, 6) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="group-select-field">
+                <label>Children</label>
+                <select name="children">
+                    {% for i in range(0, 6) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <label class="label-hint">2–11 years</label>
+            </div>
+            <div class="group-select-field">
+                <label>Infants</label>
+                <select name="infants">
+                    {% for i in range(0, 6) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <label class="label-hint">Below 2 yrs</label>
+            </div>
+        </fieldset>
 
+        <!-- Optional preferences -->
+        <fieldset class="more-option">
+            <details>
+                <summary><b>More options: </b>Class of travel, Airline Preference</summary>
+                <div class="group-field">
+                    <label>Class of travel</label>
+                    <select name="class-of-travel">
+                        <option value="economy">Economy</option>
+                        <option value="business">Business</option>
+                        <option value="firstClass">First Class</option>
+                    </select>
+                </div>
+                <div class="group-field">
+                    <label>Preferred Airline</label>
+                    <input type="text" name="airline-name" placeholder="Airline name">
+                </div>
+            </details>
+        </fieldset>
 
+        <button type="submit" class="search-btn">Search Flight</button>
+    </form>
 
-        <header>
-            <a class="cd-logo" href="#0"><img src="img/cd-logo.svg" alt="Logo"></a>
-        </header>
+    <!-- Navigation -->
+    <nav>
+      <ul class="cd-primary-nav">
+        <li><a href="{{ url_for('home') }}">HOME</a></li>
+        <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+        <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+        <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+        <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+        <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+      </ul>
+    </nav>
     
-		<nav>
-			<ul class="cd-primary-nav">
-				<li><a href="index.html">HOME</a></li>
-				<li><a href="bookin.html">BOOK NOW</a></li>
-				<li><a href="login.html">ACCOUNT</a></li>
-				<li><a href="payment.html">Pending Payment</a></li>
-				<li><a href="contact.html">CONTACT US</a></li>
-			</ul>
-		</nav>
+    
 
-    
-        <div class="cd-overlay-nav">
-            <span></span>
-        </div> <!-- cd-overlay-nav -->
-    
-        <div class="cd-overlay-content">
-            <span></span>
-        </div> <!-- cd-overlay-content -->
-    
-        <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
-    
-        <img src="../img/cd-logo.svg" alt="Logo">
-
-        <script src="../js/jquery-2.1.1.js"></script>
-        <script src="../js/velocity.min.js"></script>
-        <script src="../js/main.js"></script>
-        <script src="../js/bookin.js"></script>
-        
-
-               </body>
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bookin.js') }}"></script>
+</body>
 </html>
