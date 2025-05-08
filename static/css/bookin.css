@@ -199,11 +199,28 @@ body {
     border-radius: 6px;
     outline: none;
     font-weight: bold;
-    background: #ff7600;
+    background: #059b32;
     color: white;
     border: none;
     margin-top: 20px;
+    margin-right: 10px;
     cursor: pointer;
+    border-radius: 20px;
+  }
+
+  .return-btn {
+    float: right;
+    padding: 10px 22px;
+    border-radius: 6px;
+    outline: none;
+    font-weight: bold;
+    background: #f16248;
+    color: white;
+    border: none;
+    margin-top: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 20px;
   }
   .place-swap-btn{
     background: transparent;

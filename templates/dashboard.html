@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('{{ url_for('static', filename='img/full10.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .dashboard-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-section img {
+            max-width: 90px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 26px;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #444;
+        }
+
+        .info p {
+            margin: 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            display: inline-block;
+            margin: 8px 5px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn.logout {
+            background-color: #dc3545;
+        }
+
+        .btn.small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Logo and Address -->
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='img/jet_logo.jpg') }}" alt="Logo">
+            <div><strong>JEFJET FLIGHT BOOKINGS</strong></div>
+            <div style="font-size: 14px;">Petroleum Training Institute Warri, Delta-Nigeria</div>
+        </div>
+
+        <h1>Welcome, {{ user.name }}!</h1>
+
+        <div class="info">
+            <p><strong>User ID:</strong> {{ user.id }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>NIN:</strong> {{ user.nin }}</p>
+        </div>
+
+        {% if bookings %}
+        <div class="table-wrapper">
+            <h2 style="margin-bottom: 10px;">Your Bookings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trip Type</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Depart</th>
+                        <th>Return</th>
+                        <th>Adults</th>
+                        <th>Children</th>
+                        <th>Infants</th>
+                        <th>Class</th>
+                        <th>Airline</th>
+                        <th>Download</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bookings %}
+                    <tr>
+                        <td>{{ b.trip_type }}</td>
+                        <td>{{ b.from_location }}</td>
+                        <td>{{ b.to_location }}</td>
+                        <td>{{ b.depart_date }}</td>
+                        <td>{{ b.return_date }}</td>
+                        <td>{{ b.adults }}</td>
+                        <td>{{ b.children }}</td>
+                        <td>{{ b.infants }}</td>
+                        <td>{{ b.class_of_travel }}</td>
+                        <td>{{ b.airline_name }}</td>
+                        <td><a href="{{ url_for('download_booking', booking_id=b.id) }}" class="btn small">PDF</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No bookings yet.</p>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{{ url_for('booking') }}" class="btn">New Booking</a>
+            <a href="{{ url_for('payment') }}" class="btn">Proceed to Payment</a>
+            <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -14,7 +14,8 @@
         <div id="cloud-intro"></div>
     </div>
 
-    <form action="{{ url_for('login') }}" method="post" class="trip-form">
+    <form action="{{ url_for('submit_booking') }}" method="post" class="trip-form">
+
         <!-- Trip type selection -->
         <fieldset class="radio-group">
             <label><input type="radio" name="trip-type" value="oneWay"> One Way</label>
@@ -95,20 +96,20 @@
             </details>
         </fieldset>
 
-        <button type="submit" class="search-btn">Search Flight</button>
+        <button type="submit" class="search-btn">Submit</button>
+        <button type="submit" class="return-btn" id='return'>Back to account</button>
     </form>
 
-    <!-- Navigation -->
     <nav>
-      <ul class="cd-primary-nav">
-        <li><a href="{{ url_for('home') }}">HOME</a></li>
-        <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
-        <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
-        <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-        <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
-        <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
-      </ul>
-    </nav>
+		<ul class="cd-primary-nav">
+		  <li><a href="{{ url_for('home') }}">HOME</a></li>
+		  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+		  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+		  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+		  <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+		  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+		</ul>
+	  </nav>
     
     
 
@@ -116,6 +117,6 @@
     <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bookin.js') }}"></script>
+    
 </body>
 </html>
