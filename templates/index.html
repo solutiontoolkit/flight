@@ -28,7 +28,7 @@
 		  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
 		  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
 		  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-		  <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
+		  <li><a href="{{ url_for('payment', booking_id=1) }}">Pending Payment</a></li>
 		  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
 		</ul>
 	  </nav>
@@ -73,7 +73,7 @@
     <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
     <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bookin.js') }}"></script>
+
 
 
 

@@ -1,53 +1,71 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Book a Flight</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bookin.css') }}">
-    <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
 </head>
 <body>
 
-    <div class="container">
-        <div id="cloud-intro"></div>
-    </div>
-
     <form action="{{ url_for('submit_booking') }}" method="post" class="trip-form">
 
-        <!-- Trip type selection -->
         <fieldset class="radio-group">
-            <label><input type="radio" name="trip-type" value="oneWay"> One Way</label>
-            <label><input type="radio" name="trip-type" value="roundTrip" checked> Round trip</label>
-            <label><input type="radio" name="trip-type" value="multiCity"> Multi City</label>
+            <label><input type="radio" name="trip_type" value="oneWay"> One Way</label>
+            <label><input type="radio" name="trip_type" value="roundTrip" checked> Round trip</label>
+            <label><input type="radio" name="trip_type" value="multiCity"> Multi City</label>
         </fieldset>
 
-        <!-- From and To -->
         <fieldset>
             <div class="group-field">
                 <label>From</label>
-                <input type="text" name="from" placeholder="Any city or airport">
+                <select name="from_location">
+                    <option value="Warri">Warri</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Kaduna">Kaduna</option>
+                    <option value="Abuja">Abuja</option>
+                    <option value="Port Harcourt">Port Harcourt</option>
+                    <option value="onitsha">Onitsha</option>
+                    <option value="katsina">Katsina</option>
+                    <option value="kogi">Kogi</option>
+                    <option value="ilorin">Ilorin</option>
+                    <option value="yobe">Yobe</option>
+                    <option value="benin">Benin</option>
+                    <option value="Kano">Kano</option>
+                    <option value="jos">Jos</option>
+                </select>
             </div>
             <div class="group-field">
                 <label>To</label>
-                <input type="text" name="to" placeholder="Any city or airport">
+                <select name="to_location">
+                    <option value="Lagos">Lagos</option>
+                    <option value="Abuja">Abuja</option>
+                    <option value="Port Harcourt">Port Harcourt</option>
+                    <option value="onitsha">Onitsha</option>
+                    <option value="Kano">Kano</option>
+                    <option value="katsina">Katsina</option>
+                    <option value="kogi">Kogi</option>
+                    <option value="ilorin">Ilorin</option>
+                    <option value="yobe">Yobe</option>
+                    <option value="benin">Benin</option>
+                    <option value="jos">Jos</option>
+
+                </select>
             </div>
         </fieldset>
 
-        <!-- Dates -->
         <fieldset>
             <div class="group-field">
                 <label>Depart on</label>
-                <input type="date" name="depart">
+                <input type="date" name="depart_date">
             </div>
             <div class="group-field">
                 <label>Return on</label>
-                <input type="date" name="return">
+                <input type="date" name="return_date">
             </div>
         </fieldset>
 
-        <!-- Passengers -->
         <fieldset>
             <div class="group-select-field">
                 <label>Adults</label>
@@ -77,46 +95,28 @@
             </div>
         </fieldset>
 
-        <!-- Optional preferences -->
         <fieldset class="more-option">
             <details>
                 <summary><b>More options: </b>Class of travel, Airline Preference</summary>
                 <div class="group-field">
                     <label>Class of travel</label>
-                    <select name="class-of-travel">
-                        <option value="economy">Economy</option>
-                        <option value="business">Business</option>
-                        <option value="firstClass">First Class</option>
+                    <select name="class_of_travel">
+                        <option value="Economy">Economy</option>
+                        <option value="Business">Business</option>
+                        <option value="First Class">First Class</option>
                     </select>
                 </div>
                 <div class="group-field">
                     <label>Preferred Airline</label>
-                    <input type="text" name="airline-name" placeholder="Airline name">
+                    <input type="text" name="airline_name" placeholder="Airline name">
                 </div>
             </details>
         </fieldset>
 
         <button type="submit" class="search-btn">Submit</button>
-        <button type="submit" class="return-btn" id='return'>Back to account</button>
+        <a href="{{ url_for('dashboard') }}" class="return-btn">Back to Dashboard</a>
+
     </form>
 
-    <nav>
-		<ul class="cd-primary-nav">
-		  <li><a href="{{ url_for('home') }}">HOME</a></li>
-		  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
-		  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
-		  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-		  <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
-		  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
-		</ul>
-	  </nav>
-    
-    
-
-    <!-- JS -->
-    <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
 </body>
 </html>

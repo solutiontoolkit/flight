@@ -350,10 +350,13 @@
   color: white;
   border: none;
   border-radius: 6px;
-  background-color: #1e0377;
+  background-color: #3c0af1;
   cursor: pointer;
   -webkit-transition: 0.2s ease;
   transition: 0.2s ease;
+  border-radius: 20%;
+  font-style: bold;
+  
 }
 
 .form--button:hover,

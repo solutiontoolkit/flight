@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <meta charset="UTF-8">
     <title>User Dashboard</title>
     <style>
@@ -22,7 +23,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
             width: 90%;
-            max-width: 1000px;
+            max-width: 1600px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -126,52 +127,93 @@
         </div>
 
         {% if bookings %}
-        <div class="table-wrapper">
-            <h2 style="margin-bottom: 10px;">Your Bookings</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Trip Type</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Depart</th>
-                        <th>Return</th>
-                        <th>Adults</th>
-                        <th>Children</th>
-                        <th>Infants</th>
-                        <th>Class</th>
-                        <th>Airline</th>
-                        <th>Download</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for b in bookings %}
-                    <tr>
-                        <td>{{ b.trip_type }}</td>
-                        <td>{{ b.from_location }}</td>
-                        <td>{{ b.to_location }}</td>
-                        <td>{{ b.depart_date }}</td>
-                        <td>{{ b.return_date }}</td>
-                        <td>{{ b.adults }}</td>
-                        <td>{{ b.children }}</td>
-                        <td>{{ b.infants }}</td>
-                        <td>{{ b.class_of_travel }}</td>
-                        <td>{{ b.airline_name }}</td>
-                        <td><a href="{{ url_for('download_booking', booking_id=b.id) }}" class="btn small">PDF</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-            <p>No bookings yet.</p>
-        {% endif %}
+<div class="table-wrapper">
+    <h2 style="margin-bottom: 10px;">Your Bookings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Trip Type</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Depart</th>
+                <th>Return</th>
+                <th>Adults</th>
+                <th>Children</th>
+                <th>Infants</th>
+                <th>Class</th>
+                <th>Airline</th>
+                <th>Download</th>
+                <th>Proceed to Payment</th>
+                <th>Cancel</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td>{{ b.id }}</td>
+                <td>{{ b.trip_type }}</td>
+                <td>{{ b.from_location }}</td>
+                <td>{{ b.to_location }}</td>
+                <td>{{ b.depart_date }}</td>
+                <td>{{ b.return_date }}</td>
+                <td>{{ b.adults }}</td>
+                <td>{{ b.children }}</td>
+                <td>{{ b.infants }}</td>
+                <td>{{ b.class_of_travel }}</td>
+                <td>{{ b.airline_name }}</td>
+                <td>
+                    <a href="{{ url_for('download_booking', booking_id=b.id) }}" class="btn small">PDF</a><br>
+                    {% if b.payment_status == 'Paid' %}
+                        <a href="{{ url_for('download_payment_receipt', booking_id=b.id) }}" class="btn small" style="background-color: green; margin-top: 5px;">Receipt</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if b.payment_status == 'Paid' %}
+                        <span style="color: green; font-weight: bold;">Paid</span>
+                    {% else %}
+                        <a href="{{ url_for('payment', booking_id=b.id) }}" class="btn">Proceed to Payment</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if b.payment_status != 'Paid' %}
+                        <form action="{{ url_for('cancel_booking', booking_id=b.id) }}" method="post" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                            <button type="submit" class="btn small" style="background-color: #dc3545;">Cancel</button>
+                        </form>
+                    {% else %}
+                        <span style="color: gray;">Can't Cancel</span>
+                    {% endif %}
+                </td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+    <p>No bookings yet.</p>
+{% endif %}
 
-        <div style="text-align: center;">
-            <a href="{{ url_for('booking') }}" class="btn">New Booking</a>
-            <a href="{{ url_for('payment') }}" class="btn">Proceed to Payment</a>
-            <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+<div style="text-align: center;">
+    <a href="{{ url_for('booking') }}" class="btn">New Booking</a>
+    <p style="margin: 10px 0; font-size: 14px; color: #555;">Use the “Proceed to Payment” button next to a booking.</p>
+    <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+</div>
+
+
+<!-- Flash Message Block -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+          {{ message }}
         </div>
+      {% endfor %}
     </div>
+  {% endif %}
+{% endwith %}
+
+
 </body>
 </html>

@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
    
-
     <!-- CSS Feature Detection -->
     <script>
         document.documentElement.className = "js";
@@ -51,20 +50,18 @@
             </a>
         </header>
 
-		<nav>
-			<ul class="cd-primary-nav">
-			  <li><a href="{{ url_for('home') }}">HOME</a></li>
-			  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
-			  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
-			  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-			  <li><a href="{{ url_for('payment') }}">Pending Payment</a></li>
-			  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
-			</ul>
-		  </nav>
-		  
-		
+        <nav>
+            <ul class="cd-primary-nav">
+                <li><a href="{{ url_for('home') }}">HOME</a></li>
+                <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
+                <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
+                <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
+                <li><a href="{{ url_for('payment', booking_id=1) }}">Pending Payment</a></li>
+                <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
+            </ul>
+        </nav>
 
-          <div class="container" id="container">
+        <div class="container" id="container">
             <!-- SIGN UP FORM -->
             <div class="form-container sign-up-container">
                 <form action="/signup" method="POST">
@@ -92,12 +89,11 @@
                         <a href="{{ url_for('google.login') }}" class="social"><i class="fab fa-google"></i></a>
                         <a href="{{ url_for('facebook.login') }}" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="{{ url_for('linkedin.login') }}" class="social"><i class="fab fa-linkedin-in"></i></a>
-
                     </div>
                     <span>or use your account</span>
                     <input type="text" name="identifier" placeholder="Email or NIN" required />
                     <input type="password" name="password" placeholder="Password" required />
-                    <a href="#">Forgot your password?</a>
+                    <a href="{{ url_for('forgot_password') }}">Forgot your password?</a> <!-- Forgot Password Link -->
                     <button type="submit">Sign In</button>
                 </form>
             </div>
@@ -118,7 +114,6 @@
                 </div>
             </div>
         </div>
-        
 
         <div class="content">
             {% for i in range(1, 11) %}
@@ -131,28 +126,18 @@
     <div class="cd-overlay-content"><span></span></div>
     <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
 
-
     <!-- Flash Message-->
-<!-- Flash Message Block -->
-<!-- Flash Message Block -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="flash-messages">
-      {% for category, message in messages %}
-        <div class="flash {{ category }}">
-          {{ message }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
-
-
-  
-
-
-
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
@@ -166,8 +151,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
-    
-    
 
 </body>
 </html>

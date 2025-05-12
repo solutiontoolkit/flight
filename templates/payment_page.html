@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Payment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/payment.css') }}">
+</head>
+<body>
+    <h2>Booking Payment</h2>
+    <p>Booking ID: JEF-{{ booking.id }}</p>
+    <p>From: {{ booking.from_location }}</p>
+    <p>To: {{ booking.to_location }}</p>
+    <p>Amount Due: ₦50,000 (Simulated)</p>
+
+    <h3>Bank Transfer Information</h3>
+    <ul>
+        <li><b>Bank Name:</b> Jef Airways Bank</li>
+        <li><b>Account Name:</b> Jef Airways Ltd</li>
+        <li><b>Account Number:</b> 1234567890</li>
+        <li><b>Reference:</b> JEF-{{ booking.id }}</li>
+    </ul>
+
+    <form action="{{ url_for('confirm_payment', booking_id=booking.id) }}" method="post">
+        <button type="submit">Confirm Payment</button>
+    </form>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

@@ -1,0 +1,71 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f7ff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.confirmation-container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.congrats-img {
+    width: 120px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 26px;
+    color: #0078d7;
+    margin: 10px 0;
+}
+
+.booking-details {
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+.payment-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #0078d7;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.payment-btn:hover {
+    background-color: #005bb5;
+}
+
+.qr-section {
+    margin-top: 40px;
+}
+
+.qr-code {
+    width: 288px;
+    height: 288px;
+    margin: 0 auto;
+}
+
+.qr-text {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+

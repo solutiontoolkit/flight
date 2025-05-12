@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Slip - JEF-{{ booking.id }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pdf.css') }}">
+</head>
+<body>
+
+    <!-- Header Section with Company Info -->
+    <div class="header">
+        <img src="{{ url_for('static', filename='img/jet_logo.jpg') }}" alt="Company Logo">
+        <div class="company-info">
+            <div class="company-name">JEFJET Booking</div>
+            <div class="company-address">
+                P.O Box 4. PTI Road Uvwie City,  Delta-Nigeria <br>
+                Phone: (123) 456-7890 <br>
+                Email: mukorojeffreyoghenevwegba.com
+            </div>
+        </div>
+        <hr>
+        <h2>Customers' Booking Slip</h2>
+        <p>Booking Reference: JEF-{{ booking.id }}     <i Remeber to check your reference number before payment></p>
+    </div>
+
+    <!-- Booking Details -->
+    <div class="slip-number">
+        Slip Number: JEF-{{ booking.id }}
+    </div>
+
+    <div class="info">
+        <div><strong>Booking ID:</strong> {{ booking.id }}</div>
+        <div><strong>Trip Type:</strong> {{ booking.trip_type }}</div>
+        <div><strong>From:</strong> {{ booking.from_location }}</div>
+        <div><strong>To:</strong> {{ booking.to_location }}</div>
+        <div><strong>Departure Date:</strong> {{ booking.depart_date }}</div>
+        <div><strong>Return Date:</strong> {{ booking.return_date or 'N/A' }}</div>
+        <div><strong>Adults:</strong> {{ booking.adults }}</div>
+        <div><strong>Children:</strong> {{ booking.children }}</div>
+        <div><strong>Infants:</strong> {{ booking.infants }}</div>
+        <div><strong>Class:</strong> {{ booking.class_of_travel }}</div>
+        <div><strong>Airline:</strong> {{ booking.airline_name }}</div>
+        <div><strong>Name:</strong> {{ booking.name }}</div>
+        <div><strong>Email:</strong> {{ booking.email }}</div>
+        <div><strong>NIN:</strong> {{ booking.nin }}</div>
+    </div>
+
+    <!-- QR Code Section -->
+    <div class="barcode">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ booking.id }}" alt="Booking QR Code">
+        <div class="qr-description">
+            Scan the code to view your booking information
+        </div>
+    </div>
+
+</body>
+</html>

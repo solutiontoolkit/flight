@@ -9,6 +9,8 @@ what its been used to script in the project...
 
 .\venv\Scripts\Activate.ps1 ----- powershell venv activation
 
+http://localhost/phpmyadmin/index.php?route=/sql&pos=0&db=jet_project&table=bookings
+
 
 
 

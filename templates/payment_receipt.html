@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pdf.css') }}">
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" width="100">
+        <h1>Jef Airways Ltd</h1>
+        <p>No. 10, Aviation Plaza, Abuja, Nigeria</p>
+        <h2>PAYMENT RECEIPT</h2>
+    </div>
+
+    <div class="receipt-info">
+        <p><strong>Receipt No:</strong> JEF-Receipt-{{ booking.id }}</p>
+        <p><strong>Booking ID:</strong> JEF-{{ booking.id }}</p>
+        <p><strong>Name:</strong> {{ booking.name }}</p>
+        <p><strong>Email:</strong> {{ booking.email }}</p>
+        <p><strong>NIN:</strong> {{ booking.nin }}</p>
+        <p><strong>Status:</strong> PAID</p>
+    </div>
+
+    <div class="booking-details">
+        <p><strong>Trip Type:</strong> {{ booking.trip_type }}</p>
+        <p><strong>From:</strong> {{ booking.from_location }}</p>
+        <p><strong>To:</strong> {{ booking.to_location }}</p>
+        <p><strong>Depart Date:</strong> {{ booking.depart_date }}</p>
+        <p><strong>Return Date:</strong> {{ booking.return_date }}</p>
+        <p><strong>Adults:</strong> {{ booking.adults }}</p>
+        <p><strong>Children:</strong> {{ booking.children }}</p>
+        <p><strong>Infants:</strong> {{ booking.infants }}</p>
+        <p><strong>Class:</strong> {{ booking.class_of_travel }}</p>
+        <p><strong>Airline:</strong> {{ booking.airline_name }}</p>
+    </div>
+
+    <div class="qr-section">
+        <p><b>Scan the code to verify payment and booking details</b></p>
+        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code" width="150">
+    </div>
+
+    <p style="text-align:center; font-size:12px; margin-top:20px;">Thank you for booking with Jef Airways Ltd</p>
+</body>
+</html>

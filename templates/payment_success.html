@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            background: url('{{ url_for("static", filename="img/full10.jpg") }}') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .confirmation-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .confirmation-container img.congrats {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            margin-top: 20px;
+        }
+
+        .info {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .info p {
+            margin: 6px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 16px;
+            background-color: navy;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .logo {
+            width: 90px;
+            margin-bottom: 10px;
+        }
+
+        .company-header {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="company-header">
+            <img src="{{ url_for('static', filename='img/jet_logo.jpg') }}" class="logo" alt="Logo">
+            <h2>JEFJET FLIGHT BOOKINGS</h2>
+            <p>Petroleum Training Institute Warri, Delta-Nigeria</p>
+        </div>
+
+        <img src="{{ url_for('static', filename='img/congrat.png') }}" alt="Success" class="congrats">
+        <h1>Payment Successful!</h1>
+        <p>Thank you, {{ user.name }}. Your booking has been confirmed and marked as paid.</p>
+
+        <div class="info">
+            <p><strong>Booking ID:</strong> {{ booking.id }}</p>
+            <p><strong>Trip:</strong> {{ booking.from_location }} to {{ booking.to_location }}</p>
+            <p><strong>Departure:</strong> {{ booking.depart_date }}</p>
+            <p><strong>Return:</strong> {{ booking.return_date or 'N/A' }}</p>
+            <p><strong>Class:</strong> {{ booking.class_of_travel }}</p>
+            <p><strong>Status:</strong> <strong style="color:green;">PAID</strong></p>
+        </div>
+
+        <div class="qr-code">
+            <img src="{{ url_for('static', filename='qr_codes/paid_{}.png'.format(booking.id)) }}" alt="QR Code">
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+    </div>
+</body>
+</html>
