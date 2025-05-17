@@ -3,14 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Payment Receipt</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pdf.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #004080;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header img {
+            display: block;
+            margin: 0 auto 10px;
+        }
+        .header h1 {
+            margin: 5px 0;
+            font-size: 28px;
+            color: #004080;
+            letter-spacing: 2px;
+        }
+        .header p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        .header h2 {
+            margin-top: 20px;
+            font-size: 22px;
+            color: #004080;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .receipt-info, .booking-details {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            padding: 15px 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .receipt-info p, .booking-details p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .receipt-info p strong, .booking-details p strong {
+            width: 130px;
+            display: inline-block;
+            color: #004080;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .qr-section p {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #004080;
+            font-size: 16px;
+        }
+        .qr-section img {
+            border: 2px solid #004080;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 13px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Company Logo" width="100">
-        <h1>Jef Airways Ltd</h1>
-        <p>No. 10, Aviation Plaza, Abuja, Nigeria</p>
-        <h2>PAYMENT RECEIPT</h2>
+        <h1>JEFJET BOOKING NIG. LTD.</h1>
+        <p>No. 10, Aviation Plaza, Warri, Nigeria</p>
+        <h2>Payment Receipt</h2>
     </div>
 
     <div class="receipt-info">
@@ -19,7 +98,7 @@
         <p><strong>Name:</strong> {{ booking.name }}</p>
         <p><strong>Email:</strong> {{ booking.email }}</p>
         <p><strong>NIN:</strong> {{ booking.nin }}</p>
-        <p><strong>Status:</strong> PAID</p>
+        <p><strong>Status:</strong> <span style="color:green; font-weight:bold;">PAID</span></p>
     </div>
 
     <div class="booking-details">
@@ -27,7 +106,7 @@
         <p><strong>From:</strong> {{ booking.from_location }}</p>
         <p><strong>To:</strong> {{ booking.to_location }}</p>
         <p><strong>Depart Date:</strong> {{ booking.depart_date }}</p>
-        <p><strong>Return Date:</strong> {{ booking.return_date }}</p>
+        <p><strong>Return Date:</strong> {{ booking.return_date or 'N/A' }}</p>
         <p><strong>Adults:</strong> {{ booking.adults }}</p>
         <p><strong>Children:</strong> {{ booking.children }}</p>
         <p><strong>Infants:</strong> {{ booking.infants }}</p>
@@ -36,10 +115,10 @@
     </div>
 
     <div class="qr-section">
-        <p><b>Scan the code to verify payment and booking details</b></p>
+        <p>Scan the code to verify payment and booking details</p>
         <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code" width="150">
     </div>
 
-    <p style="text-align:center; font-size:12px; margin-top:20px;">Thank you for booking with Jef Airways Ltd</p>
+    <footer>Thank you for booking with JefJet Nig. Ltd</footer>
 </body>
 </html>

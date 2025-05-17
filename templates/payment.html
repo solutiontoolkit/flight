@@ -53,13 +53,13 @@
     </div>
 
     <div class="form-container">
-      <form class="form" action="{{ url_for('process_payment') }}" method="POST">
-        <input type="hidden" name="booking_id" value="{{ booking_id }}">
+     <form class="form" action="{{ url_for('process_payment', booking_id=booking.id) }}" method="POST">
+          <input type="hidden" name="booking_id" value="{{ booking.id }}">
 
         <div class="form--input">
-          <label class="form--input_label" for="number">Card Number</label>
+          <label class="form--input_label" for="card_number">Card Number</label>
           <span class="form--input__invalid-info">Provide valid card number!</span>
-          <input class="form--input_input" type="text" name="number" id="number" maxlength="16" required />
+          <input class="form--input_input" type="text" name="card_number" id="number" maxlength="16" required />
         </div>
 
         <div class="form--input">
@@ -70,13 +70,13 @@
         <div class="form--row">
           <div class="form--col -date">
             <label class="form--input_label" for="date">Expiration Date</label>
-            <select class="form--input_input _select" name="date--month" id="month" required>
+            <select class="form--input_input _select" name="expiry_month" id="month" required>
               <option value="" disabled selected>Month</option>
               {% for i in range(1, 13) %}
               <option value="{{ '%02d' % i }}">{{ i }}</option>
               {% endfor %}
             </select>
-            <select class="form--input_input _select" name="date--year" id="year" required>
+            <select class="form--input_input _select" name="expiry_year" id="year" required>
               <option value="" disabled selected>Year</option>
               {% for year in range(2024, 2031) %}
               <option value="{{ year }}">{{ year }}</option>
@@ -92,7 +92,8 @@
           </div>
         </div>
 
-        <a href="{{ url_for('payment', booking_id=booking.id) }}" class="form--button">Submit</a>
+        <button type="submit" class="form--button">Submit</button>
+      </form>
 
       </form>
     </div>

@@ -12,7 +12,7 @@ import qrcode
 import io
 from flask import send_file
 from flask import render_template_string
-from database.db import get_user_by_email
+from database.db import get_user_by_email, get_booking_by_id, mark_booking_paid, get_booking
 from itsdangerous import URLSafeTimedSerializer
 import smtplib
 from email.message import EmailMessage
@@ -21,7 +21,12 @@ from reportlab.pdfgen import canvas
 from datetime import datetime
 from database import db
 
-
+from flask import send_file
+import qrcode
+import base64
+from datetime import datetime
+from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
 
 # Import modules
 from database.db import get_db_connection
@@ -32,7 +37,7 @@ from flask_dance.contrib.google import google
 from flask_dance.contrib.facebook import facebook
 from flask_dance.contrib.linkedin import linkedin
 from itsdangerous import URLSafeTimedSerializer as Serializer, BadSignature, SignatureExpired
-
+from flask_login import current_user
 
 # Load environment variables
 load_dotenv()
@@ -58,7 +63,15 @@ app.register_blueprint(facebook_bp, url_prefix="/login")
 app.register_blueprint(linkedin_bp, url_prefix="/login")
 
 
+
+
 # --- Routes ---
+
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -83,14 +96,16 @@ def dashboard():
 
         # Fetch bookings for user
         cursor.execute("""
-            SELECT 
-                id, trip_type, from_location, to_location,
-                depart_date, return_date, adults, children, infants,
-                class_of_travel, airline_name, created_at
-            FROM bookings
-            WHERE user_id = %s
-            ORDER BY id DESC
-        """, (user_id,))
+    SELECT 
+        id, trip_type, from_location, to_location, depart_date, 
+        return_date, adults, children, infants, class_of_travel,
+        airline_name, payment_status
+    FROM 
+        bookings
+    WHERE 
+        user_id = %s
+    ORDER BY id DESC
+    """, (user_id,))
         bookings = cursor.fetchall()
 
     finally:
@@ -111,39 +126,34 @@ def booking():
         return redirect(url_for('account'))
     return render_template('bookin.html')
 
-@app.route('/payment/<int:booking_id>', methods=['GET', 'POST'])
-def payment(booking_id):
+@app.route('/my_bookings_test')
+def my_bookings_test():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('account'))
 
-    # Check the booking exists and belongs to the user
-    booking = db.get_booking(booking_id, user_id)
-    if not booking:
-        flash('Invalid booking or unauthorized access.', 'danger')
-        return redirect(url_for('dashboard'))
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, from_location, to_location, depart_date, payment_status FROM bookings WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
 
-    if request.method == 'POST':
-        # Simulate saving payment info (in real you would process card)
-        card_number = request.form.get('card_number')
-        expiry = request.form.get('expiry')
-        cvv = request.form.get('cvv')
+    if not bookings:
+        return "<h3>No bookings found for your account.</h3>"
 
-        if card_number and expiry and cvv:
-            # Mark booking as paid in your database
-            db.mark_booking_paid(booking_id)
+    html = "<h2>Your Bookings (Test View)</h2><ul>"
+    for b in bookings:
+        html += f"""
+        <li>
+            Booking ID: {b['id']} | {b['from_location']} to {b['to_location']} on {b['depart_date']} 
+            | Status: {b['payment_status']} 
+            | <a href="{url_for('payment', booking_id=b['id'])}">PAY NOW</a>
+        </li>
+        """
+    html += "</ul>"
 
-            # Flash message
-            flash('Payment successful! Your receipt is ready.', 'success')
-
-            # Redirect to payment success page
-            return redirect(url_for('payment_success', booking_id=booking_id))
-        else:
-            flash('Please fill all payment details.', 'danger')
-
-    return render_template('payment.html', booking=booking)
-
-
+    return html
 
 
 
@@ -198,12 +208,18 @@ def signin():
     conn.close()
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+        # ✅ Store full user info in session
         session['user_id'] = user['id']
-        flash('You have successfully logged In!', 'success')
+        session['user_name'] = user['name']
+        session['user_email'] = user['email']
+        session['user_nin'] = user['nin']
+
+        flash(f'Welcome {user["name"]}!', 'success')
         return redirect(url_for('dashboard'))
     else:
         flash('Invalid email/NIN or password. Please try again.', 'danger')
         return render_template('login.html')
+
 
 @app.route('/signin', methods=['GET'])
 def show_signin():
@@ -258,10 +274,7 @@ def submit_booking():
 
 
 
-from flask import send_file
-import qrcode
-import base64
-from datetime import datetime
+
 
 @app.route('/download_booking/<int:booking_id>')
 def download_booking(booking_id):
@@ -271,10 +284,10 @@ def download_booking(booking_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT b.*, u.name, u.email, u.nin, u.id AS user_id
+        SELECT b.*, u.name, u.email, u.nin
         FROM bookings b
         JOIN users u ON b.user_id = u.id
-        WHERE b.id = %s AND u.id = %s
+        WHERE b.id = %s AND b.user_id = %s
     """, (booking_id, session['user_id']))
     booking = cursor.fetchone()
     cursor.close()
@@ -283,19 +296,69 @@ def download_booking(booking_id):
     if not booking:
         return "Booking not found."
 
-    # Use your booking_slip.html and pass 'booking'
-    pdf_html = render_template('booking_slip.html', booking=booking)
+    # Generate QR code
+    qr_data = f"Booking Reference: JEF-{booking['id']}\nPassenger: {booking['name']}\nEmail: {booking['email']}"
+    img = qrcode.make(qr_data)
+    qr_buffer = BytesIO()
+    img.save(qr_buffer, format="PNG")
+    qr_buffer.seek(0)
+    qr_image = ImageReader(qr_buffer)
 
+    # Create PDF
     pdf_stream = BytesIO()
-    pisa_status = pisa.CreatePDF(pdf_html, dest=pdf_stream)
-    if pisa_status.err:
-        return "PDF generation failed."
+    c = canvas.Canvas(pdf_stream, pagesize=letter)
+
+    # Company Header
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(50, 750, "JEFJET Booking")
+    c.setFont("Helvetica", 10)
+    c.drawString(50, 735, "P.O Box 4. PTI Road Uvwie City, Delta-Nigeria")
+    c.drawString(50, 720, "Phone: (123) 456-7890")
+    c.drawString(50, 705, "Email: mukorojeffreyoghenevwegba.com")
+    c.line(50, 700, 550, 700)
+
+    # Booking Title
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(50, 680, "Customers' Booking Slip")
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 660, f"Booking Reference: JEF-{booking['id']} ")
+
+    # Booking Info
+    y = 640
+    info_lines = [
+        f"Slip Number: JEF-{booking['id']}",
+        f"Booking ID: {booking['id']}",
+        f"Trip Type: {booking['trip_type']}",
+        f"From: {booking['from_location']}",
+        f"To: {booking['to_location']}",
+        f"Departure Date: {booking['depart_date']}",
+        f"Return Date: {booking['return_date'] or 'N/A'}",
+        f"Adults: {booking['adults']}",
+        f"Children: {booking['children']}",
+        f"Infants: {booking['infants']}",
+        f"Class: {booking['class_of_travel']}",
+        f"Airline: {booking['airline_name']}",
+        f"Name: {booking['name']}",
+        f"Email: {booking['email']}",
+        f"NIN: {booking['nin']}",
+    ]
+    for line in info_lines:
+        c.drawString(50, y, line)
+        y -= 15
+
+    # QR Code
+    c.drawImage(qr_image, 400, 550, width=150, height=150)
+    c.setFont("Helvetica", 10)
+    c.drawString(400, 540, "Scan the code to view your booking info")
+
+    c.showPage()
+    c.save()
 
     pdf_stream.seek(0)
-    response = make_response(pdf_stream.read())
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=booking_{booking_id}.pdf'
-    return response
+    return send_file(pdf_stream, as_attachment=True, download_name=f'booking_slip_{booking_id}.pdf', mimetype='application/pdf')
+
+
+
 
 # Social login callbacks
 @app.route("/google_callback")
@@ -446,113 +509,101 @@ Your App Team
         print("Error sending email:", e)
 
 
-
 @app.route('/booking_confirmation/<int:booking_id>')
 def booking_confirmation(booking_id):
     if 'user_id' not in session:
         return redirect(url_for('account'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT b.*, u.name AS full_name
-        FROM bookings b
-        JOIN users u ON b.user_id = u.id
-        WHERE b.id = %s AND b.user_id = %s
-    """, (booking_id, session['user_id']))
-    
-    booking = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
+    # ✅ Always pass both booking_id and session['user_id']
+    booking = db.get_booking_by_id(booking_id, session['user_id'])
     if not booking:
-        return "Booking not found."
-
-    # Generate QR code
-    qr_data = f"http://localhost:5000/payment/{booking_id}"
-    img = qrcode.make(qr_data)
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
-
-    return render_template("booking_confirmation.html", booking=booking, qr_code=qr_code_base64)
-
-
-
-@app.route('/payment_success/<int:booking_id>')
-def payment_success_page(booking_id):
-    return render_template('payment_success.html', booking_id=booking_id)
-
-
-@app.route('/process_payment', methods=['POST'])
-def process_payment():
-    booking_id = request.form.get('booking_id')
-
-    if not booking_id or not booking_id.isdigit():
-        return "Invalid booking ID", 400
-
-    booking_id = int(booking_id)
-
-    # Process the payment...
-    return redirect(url_for('payment_success_page', booking_id=booking_id))
-
-@app.route('/test_payment_success/<int:booking_id>')
-def test_payment_success(booking_id):
-    # Simulate a successful payment scenario
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('account'))
-
-    # Fetch booking details
-    booking = db.get_booking(booking_id, user_id)
-    if not booking:
-        flash('Booking not found.', 'danger')
+        flash("Booking not found or unauthorized access.", "danger")
         return redirect(url_for('dashboard'))
 
-    # For testing purposes, manually mark the booking as paid
-    db.mark_booking_paid(booking_id)  # This would mark the booking as "paid" in your database
+    # ✅ QR code now points correctly to the payment route
+    qr_data = url_for('payment', booking_id=booking_id, _external=True)
 
-    # Flash a success message
-    flash('Payment was successful for booking ID: {}'.format(booking_id), 'success')
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill='black', back_color='white')
+    buffer = BytesIO()
+    img.save(buffer, 'PNG')
+    buffer.seek(0)
+    img_str = base64.b64encode(buffer.read()).decode('utf-8')
 
-    # Redirect to the payment success page
-    return redirect(url_for('payment_success', booking_id=booking_id))
+    return render_template('booking_confirmation.html', booking=booking, qr_code=img_str)
 
 
 @app.route('/payment/<int:booking_id>')
-def payment_page(booking_id):
+def payment(booking_id):
     if 'user_id' not in session:
         return redirect(url_for('account'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, session['user_id']))
-    booking = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
+    booking = db.get_booking_by_id(booking_id, session['user_id'])
     if not booking:
-        return "Booking not found."
+        flash("Booking not found.", "danger")
+        return redirect(url_for('dashboard'))
 
-    return render_template('payment_page.html', booking=booking)
+    if booking['user_id'] != session['user_id']:
+        flash("Unauthorized access.", "danger")
+        return redirect(url_for('dashboard'))
+
+    if booking['payment_status'] and booking['payment_status'].lower() == 'paid':
+        flash("Booking already paid.", "info")
+        return redirect(url_for('payment_success_page', booking_id=booking_id))
+
+    return render_template('payment.html', booking=booking)
 
 
 
-@app.route('/confirm_payment/<int:booking_id>', methods=['POST'])
+
+@app.route('/process_payment/<int:booking_id>', methods=['POST'])
+def process_payment(booking_id):
+    card_number = request.form.get('card_number')
+    expiry_month = request.form.get('expiry_month')
+    expiry_year = request.form.get('expiry_year')
+    cvv = request.form.get('cvv')
+
+    if not (card_number and expiry_month and expiry_year and cvv):
+        flash("Please fill all payment details.", "danger")
+        return redirect(url_for('payment', booking_id=booking_id))
+
+    # Process as normal
+    db.mark_booking_paid(booking_id)
+    flash('Payment successful!', 'success')
+    return redirect(url_for('payment_success_page', booking_id=booking_id))
+
+
+@app.route('/payment_confirm/<int:booking_id>', methods=['POST'])
 def confirm_payment(booking_id):
     if 'user_id' not in session:
         return redirect(url_for('account'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE bookings SET payment_status = 'Paid' WHERE id = %s AND user_id = %s", (booking_id, session['user_id']))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    booking = db.get_booking_by_id(booking_id)
+    if not booking or booking['user_id'] != session['user_id']:
+        flash("Invalid booking.", "danger")
+        return redirect(url_for('dashboard'))
 
-    return redirect(url_for('dashboard'))
+    if booking['payment_status'] != 'paid':
+        mark_booking_paid(booking_id)
+        flash("Payment successful!", "success")
+
+    return redirect(url_for('payment_success_page', booking_id=booking_id))
+
+@app.route('/payment_success/<int:booking_id>')
+def payment_success_page(booking_id):
+    if 'user_id' not in session:
+        return redirect(url_for('account'))
+
+    booking = db.get_booking_by_id(booking_id, session['user_id'])
+    if not booking:
+        flash("Booking not found.", "danger")
+        return redirect(url_for('dashboard'))
+
+    return render_template('payment_success.html', booking=booking)
+
+
 
 @app.route('/download_payment_receipt/<int:booking_id>')
 def download_payment_receipt(booking_id):
@@ -574,7 +625,7 @@ def download_payment_receipt(booking_id):
     if not booking:
         return "Booking not found."
 
-    if booking['payment_status'] != 'Paid':
+    if booking['payment_status'] != 'paid':
         return "Payment not confirmed yet."
 
     # Generate QR code (for demonstration)
@@ -597,6 +648,51 @@ def download_payment_receipt(booking_id):
     response.headers['Content-Disposition'] = f'attachment; filename=receipt_JEF-{booking_id}.pdf'
     return response
 
+
+@app.route('/download_paid_receipt/<int:booking_id>')
+def download_paid_receipt(booking_id):
+    if 'user_id' not in session:
+        return redirect(url_for('account'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT b.*, u.name, u.email, u.nin
+        FROM bookings b
+        JOIN users u ON b.user_id = u.id
+        WHERE b.id = %s AND b.user_id = %s
+    """, (booking_id, session['user_id']))
+    booking = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not booking:
+        return "Booking not found."
+
+    # Generate QR code with booking info
+    qr_data = f"PAID\nBooking ID: {booking_id}\nName: {booking['name']}"
+    img = qrcode.make(qr_data)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    qr_code_data = buffer.read()
+
+    # Create PDF
+    pdf_stream = BytesIO()
+    c = canvas.Canvas(pdf_stream, pagesize=letter)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, 750, "PAID RECEIPT")
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 720, f"Booking ID: {booking_id}")
+    c.drawString(50, 700, f"Passenger: {booking['name']}")
+    c.drawString(50, 680, f"Email: {booking['email']}")
+    c.drawString(50, 660, f"Status: PAID")
+    c.drawImage(io.BytesIO(qr_code_data), 400, 600, width=150, height=150)
+    c.showPage()
+    c.save()
+
+    pdf_stream.seek(0)
+    return send_file(pdf_stream, as_attachment=True, download_name=f'paid_receipt_{booking_id}.pdf', mimetype='application/pdf')
 
 
 
@@ -640,48 +736,58 @@ from email_utils import send_email  # adjust to match your actual import
 from flask import flash, redirect, url_for
 from email_utils import send_email_notification
 
+from flask import jsonify, request
+
 @app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
 def cancel_booking(booking_id):
     if 'user_id' not in session:
-        return redirect(url_for('account'))  # Ensure user is logged in
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Unauthorized'}), 401
+        return redirect(url_for('account'))
 
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        # Check if the booking exists and belongs to the user
         cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
         booking = cursor.fetchone()
 
         if not booking:
-            flash('Booking not found or you are not authorized to cancel it.', 'danger')
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Booking not found or unauthorized.'}), 404
+            flash('Booking not found or unauthorized.', 'danger')
             return redirect(url_for('dashboard'))
 
-        # Check if the user has already canceled two bookings
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE user_id = %s AND status = 'cancelled'", (user_id,))
         cancel_count = cursor.fetchone()[0]
 
         if cancel_count >= 2:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Cancellation limit reached.'}), 400
             flash('You have reached the limit of cancellations allowed.', 'danger')
             return redirect(url_for('dashboard'))
 
-        # Update the booking status to 'cancelled'
         cursor.execute("UPDATE bookings SET status = 'cancelled' WHERE id = %s", (booking_id,))
         conn.commit()
 
-        # Send email notification
         send_email_notification(user_id, booking_id, "cancellation")
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': 'Booking cancelled successfully.'}), 200
 
         flash('Your booking has been successfully cancelled.', 'success')
     except Exception as e:
         conn.rollback()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': f'Error cancelling booking: {str(e)}'}), 500
         flash(f"An error occurred while cancelling the booking: {e}", 'danger')
     finally:
         cursor.close()
         conn.close()
 
     return redirect(url_for('dashboard'))
+
 
 
 

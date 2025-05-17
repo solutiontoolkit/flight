@@ -92,19 +92,21 @@
 <body>
     <div class="confirmation">
         <img src="{{ url_for('static', filename='img/congrat.png') }}" alt="Congrats">
-        <h2>Congratulations {{ booking.full_name or 'Valued User' }}!</h2>
+        <h2>Congratulations !!! {{ booking.full_name or 'Valued User' }}!</h2>
         <p>Your flight from <strong>{{ booking.from_location }}</strong> to <strong>{{ booking.to_location }}</strong> has been successfully booked.</p>
         
         <div class="qr-code">
             <img src="data:image/png;base64,{{ qr_code }}" alt="Payment QR Code">
-            <p><strong>Scan this code to proceed with booking payment</strong></p>
+            <p><strong>Scan this QRcode above to proceed with booking payment <br><br>OR <br>
+                
+                <p><strong>Go to Dashboard and Proceed to payment Using Button<strong/> </p>
+            </strong></p>
         </div>
 
         <a href="{{ url_for('dashboard') }}">
             
             <button class='btn'>Go to Dashboard</button>
         </a>
-        <li><a href="{{ url_for('payment', booking_id=1) }}">Pending Payment</a></li>
 
     </div>
 

@@ -1,0 +1,29 @@
+[33mcommit 8d46254a6a699a7c3cea9be86295de694513fd0b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Joshua Henry <solutiontoolkit1@gmail.com>
+Date:   Mon May 12 19:46:13 2025 +0100
+
+    udated with pdf and complete user dashboard version--1 . 2
+
+[33mcommit 7fae52c260717bf5c2d30774d0957d2d8b12cc5a[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Joshua Henry <solutiontoolkit1@gmail.com>
+Date:   Thu May 8 20:00:14 2025 +0100
+
+    authentication version 1
+
+[33mcommit e005a68f0c0a9956601ad4ff29bd4ace9a81402e[m
+Author: Joshua Henry <solutiontoolkit1@gmail.com>
+Date:   Mon May 5 20:19:54 2025 +0100
+
+    version2.1 css complete
+
+[33mcommit 3491479019b9fcb5068c50e6ca561e8abdffdf57[m
+Author: Joshua Henry <solutiontoolkit1@gmail.com>
+Date:   Mon May 5 09:17:23 2025 +0100
+
+    Flask_session
+
+[33mcommit 7d32ef6f37e0d30d1d404785ff8c0653e294fbd4[m
+Author: Joshua Henry <solutiontoolkit1@gmail.com>
+Date:   Sat May 3 01:21:19 2025 +0100
+
+    css linked up to html version

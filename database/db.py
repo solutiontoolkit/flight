@@ -1,4 +1,8 @@
 import mysql.connector
+import pymysql
+import os
+import mysql.connector
+from dotenv import load_dotenv
 
 def get_connection():
     return mysql.connector.connect(
@@ -9,9 +13,7 @@ def get_connection():
     )
 
 
-import os
-import mysql.connector
-from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -27,19 +29,35 @@ def get_db_connection():
 
 def get_booking(booking_id, user_id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # Use dictionary=True to fetch data as dict
-    query = """
-        SELECT * FROM bookings 
-        WHERE id = %s AND user_id = %s
-    """
-    cursor.execute(query, (booking_id, user_id))
-    booking = cursor.fetchone()  # fetchone will return None if no result
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT * FROM bookings WHERE id = %s AND user_id = %s",
+        (booking_id, user_id)
+    )
+    booking = cursor.fetchone()
     cursor.close()
     conn.close()
     return booking
 
-import pymysql
-from database.db import get_db_connection  # adjust based on your project structure
+def get_bookings(booking_id, user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM bookings WHERE user_id = %s ORDER BY created_at DESC", (booking_id, user_id,))
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    # ✅ Normalize payment_status
+    for booking in bookings:
+        if 'payment_status' in booking and booking['payment_status']:
+            booking['payment_status'] = booking['payment_status'].lower()
+
+    return bookings
+
+
+
+
+
 
 def get_user_by_email(email):
     conn = get_db_connection()
@@ -50,3 +68,33 @@ def get_user_by_email(email):
     cursor.close()
     conn.close()
     return user
+
+
+# database/db.py
+
+def get_booking_by_id(booking_id, user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
+    booking = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    # ✅ Normalize payment_status to always be lowercase if exists
+    if booking and 'payment_status' in booking and booking['payment_status']:
+        booking['payment_status'] = booking['payment_status'].lower()
+
+    return booking
+
+
+def mark_booking_paid(booking_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # ✅ Always update to lowercase 'paid'
+    cursor.execute("UPDATE bookings SET payment_status = 'paid' WHERE id = %s", (booking_id,))
+    cursor.execute("UPDATE bookings SET status = 'PAID' WHERE id = %s", (booking_id,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+

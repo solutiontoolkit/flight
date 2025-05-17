@@ -61,6 +61,12 @@
             color: white;
             text-decoration: none;
             border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .btn.receipt {
+            background-color: green;
+            margin-top: 10px;
         }
 
         .logo {
@@ -98,7 +104,8 @@
             <img src="{{ url_for('static', filename='qr_codes/paid_{}.png'.format(booking.id)) }}" alt="QR Code">
         </div>
 
-        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a><br>
+        <a href="{{ url_for('download_payment_receipt', booking_id=booking.id) }}" class="btn receipt">Download Payment Receipt</a>
     </div>
 </body>
 </html>
