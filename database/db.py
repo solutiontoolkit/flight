@@ -39,20 +39,24 @@ def get_booking(booking_id, user_id):
     conn.close()
     return booking
 
-def get_bookings(booking_id, user_id):
+def get_bookings(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM bookings WHERE user_id = %s ORDER BY created_at DESC", (booking_id, user_id,))
+    cursor.execute("""
+        SELECT * FROM bookings 
+        WHERE user_id = %s AND status != 'cancelled' 
+        ORDER BY created_at DESC
+    """, (user_id,))
     bookings = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    # ✅ Normalize payment_status
     for booking in bookings:
         if 'payment_status' in booking and booking['payment_status']:
             booking['payment_status'] = booking['payment_status'].lower()
 
     return bookings
+
 
 
 
@@ -75,14 +79,21 @@ def get_user_by_email(email):
 def get_booking_by_id(booking_id, user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
+    cursor.execute("""
+        SELECT b.*, u.name, u.email, u.nin
+        FROM bookings b
+        JOIN users u ON b.user_id = u.id
+        WHERE b.id = %s AND b.user_id = %s
+    """, (booking_id, user_id))
     booking = cursor.fetchone()
     cursor.close()
     conn.close()
 
-    # ✅ Normalize payment_status to always be lowercase if exists
-    if booking and 'payment_status' in booking and booking['payment_status']:
-        booking['payment_status'] = booking['payment_status'].lower()
+    if booking:
+        if 'payment_status' in booking and booking['payment_status']:
+            booking['payment_status'] = booking['payment_status'].lower()
+        if 'status' in booking and booking['status']:
+            booking['status'] = booking['status'].lower()
 
     return booking
 

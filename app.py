@@ -44,15 +44,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Configure Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.getenv("EMAIL_ADDRESS")
 app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASSWORD")
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
 
 mail = Mail(app)
+
 
 # Secret key for session management
 app.secret_key = os.getenv('SECRET_KEY', 'fallback-secret-key')
@@ -76,9 +75,43 @@ def inject_user():
 def home():
     return render_template('index.html')
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 def account():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'signup':
+            name = request.form['name']
+            email = request.form['email']
+            nin = request.form['nin']
+            password = request.form['password']
+            
+            # Check if user already exists
+            if get_user_by_email(email):
+                flash('Email already registered. Please log in.', 'warning')
+                return redirect(url_for('account'))
+            
+            # Create new user
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (name, email, nin, password) VALUES (%s, %s, %s, %s)", 
+                           (name, email, nin, password))
+            conn.commit()
+            user_id = cursor.lastrowid  # ✅ Get new user's ID
+            cursor.close()
+            conn.close()
+
+            # ✅ Automatically log in the user
+            session['user_id'] = user_id
+
+            flash('Signup successful. Welcome!', 'success')
+            return redirect(url_for('dashboard'))  # ✅ Go straight to dashboard
+
+        elif action == 'login':
+            # existing login logic here...
+            pass
+
     return render_template('login.html')
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -509,20 +542,24 @@ Your App Team
         print("Error sending email:", e)
 
 
+from email_utils import send_booking_confirmation_email  # Import your email util
+from email_utils import generate_booking_slip_pdf  # You can create this helper if not existing yet
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+
+
 @app.route('/booking_confirmation/<int:booking_id>')
 def booking_confirmation(booking_id):
     if 'user_id' not in session:
         return redirect(url_for('account'))
 
-    # ✅ Always pass both booking_id and session['user_id']
     booking = db.get_booking_by_id(booking_id, session['user_id'])
     if not booking:
         flash("Booking not found or unauthorized access.", "danger")
         return redirect(url_for('dashboard'))
 
-    # ✅ QR code now points correctly to the payment route
+    # QR Code for payment
     qr_data = url_for('payment', booking_id=booking_id, _external=True)
-
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(qr_data)
     qr.make(fit=True)
@@ -532,7 +569,22 @@ def booking_confirmation(booking_id):
     buffer.seek(0)
     img_str = base64.b64encode(buffer.read()).decode('utf-8')
 
+    # Generate booking slip PDF
+    pdf_path = f"./static/booking_slip_{booking['id']}.pdf"
+    generate_booking_slip_pdf(booking, pdf_path)
+
+    # Send email
+    user = db.get_user_by_email(session['user_id'])
+    if user:
+        is_paid = booking['payment_status'] == 'paid'
+        send_booking_confirmation_email(user['email'], user['name'], booking, is_paid=is_paid)
+        flash("📩 Booking confirmation email sent!", "success")
+
     return render_template('booking_confirmation.html', booking=booking, qr_code=img_str)
+
+
+
+
 
 
 @app.route('/payment/<int:booking_id>')
@@ -549,11 +601,17 @@ def payment(booking_id):
         flash("Unauthorized access.", "danger")
         return redirect(url_for('dashboard'))
 
-    if booking['payment_status'] and booking['payment_status'].lower() == 'paid':
+    # ✅ Prevent payment for cancelled bookings
+    if booking.get('status', '').lower() == 'cancelled':
+        flash("This booking has been cancelled and cannot be paid for.", "warning")
+        return redirect(url_for('dashboard'))
+
+    if booking.get('payment_status', '').lower() == 'paid':
         flash("Booking already paid.", "info")
         return redirect(url_for('payment_success_page', booking_id=booking_id))
 
     return render_template('payment.html', booking=booking)
+
 
 
 
@@ -587,9 +645,19 @@ def confirm_payment(booking_id):
 
     if booking['payment_status'] != 'paid':
         mark_booking_paid(booking_id)
-        flash("Payment successful!", "success")
+        flash("✅ Payment successful!", "success")
+
+        # Refresh booking object after update
+        booking = db.get_booking_by_id(booking_id)
+
+        user = db.get_user_by_email(session['user_id'])
+        if user:
+            send_booking_confirmation_email(user['email'], user['name'], booking, is_paid=True)
+            flash("📧 Payment confirmation email sent!", "success")
 
     return redirect(url_for('payment_success_page', booking_id=booking_id))
+
+
 
 @app.route('/payment_success/<int:booking_id>')
 def payment_success_page(booking_id):
@@ -738,55 +806,45 @@ from email_utils import send_email_notification
 
 from flask import jsonify, request
 
-@app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
+@app.route('/cancel/<int:booking_id>', methods=['POST'])
 def cancel_booking(booking_id):
     if 'user_id' not in session:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'error': 'Unauthorized'}), 401
         return redirect(url_for('account'))
 
     user_id = session['user_id']
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
+        # Check if booking exists and belongs to user
+        cursor.execute("SELECT payment_status FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
         booking = cursor.fetchone()
 
         if not booking:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'error': 'Booking not found or unauthorized.'}), 404
-            flash('Booking not found or unauthorized.', 'danger')
+            flash("Booking not found or unauthorized.", "danger")
             return redirect(url_for('dashboard'))
 
-        cursor.execute("SELECT COUNT(*) FROM bookings WHERE user_id = %s AND status = 'cancelled'", (user_id,))
-        cancel_count = cursor.fetchone()[0]
+        payment_status = booking[0].lower() if booking[0] else ''
 
-        if cancel_count >= 2:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'error': 'Cancellation limit reached.'}), 400
-            flash('You have reached the limit of cancellations allowed.', 'danger')
+        if payment_status == 'paid':
+            flash("You cannot cancel a booking that has already been paid.", "warning")
             return redirect(url_for('dashboard'))
 
-        cursor.execute("UPDATE bookings SET status = 'cancelled' WHERE id = %s", (booking_id,))
+        # Delete unpaid booking
+        cursor.execute("DELETE FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
         conn.commit()
+        flash("Booking successfully cancelled and deleted.", "success")
 
-        send_email_notification(user_id, booking_id, "cancellation")
-
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': 'Booking cancelled successfully.'}), 200
-
-        flash('Your booking has been successfully cancelled.', 'success')
-    except Exception as e:
-        conn.rollback()
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'error': f'Error cancelling booking: {str(e)}'}), 500
-        flash(f"An error occurred while cancelling the booking: {e}", 'danger')
     finally:
         cursor.close()
         conn.close()
 
     return redirect(url_for('dashboard'))
+
+
+
+
 
 
 

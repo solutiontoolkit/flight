@@ -125,6 +125,23 @@
         .action-buttons .btn {
             margin: 0;
         }
+
+        .custom-tooltip {
+            position: absolute;
+            background: linear-gradient(to right, #28a745, #d2b48c); /* green to light chocolate */
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        
     </style>
 </head>
 <body>
@@ -146,8 +163,8 @@
 
         <!-- Sticky Buttons -->
         <div class="action-buttons">
-            <a href="{{ url_for('booking') }}" class="btn">New Booking</a>
-            <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+            <a href="{{ url_for('booking') }}" class="btn" id="newBookingBtn">New Booking</a>
+            <a href="{{ url_for('logout') }}" class="btn logout" id="logoutBtn">Logout</a>
         </div>
 
         {% if bookings %}
@@ -195,7 +212,7 @@
                         </td>
                         <td>
                             {% if b.payment_status and b.payment_status.lower() == 'paid' %}
-                                <a href="{{ url_for('download_booking', booking_id=b.id) }}" class="btn small">Paid Booking PDF</a><br>
+                                <a href="{{ url_for('download_payment_receipt', booking_id=b.id) }}" class="btn small">Paid Booking PDF</a><br>
                                 <a href="{{ url_for('download_payment_receipt', booking_id=b.id) }}" class="btn small" style="background-color: green;">Receipt</a>
                             {% else %}
                                 <a href="{{ url_for('download_booking', booking_id=b.id) }}" class="btn small">Booking PDF</a>
@@ -203,12 +220,13 @@
                         </td>
                         <td>
                             {% if b.payment_status and b.payment_status.lower() == 'paid' %}
-                                <span style="color: gray;">No Action</span>
+                                <span style="color: gray;">Payment Received</span>
                             {% else %}
                             <a href="{{ url_for('payment', booking_id=b.id) }}" class="btn">Proceed to Payment</a><br>
-                            <button type="button" class="btn small cancel-btn" data-booking-id="{{ b.id }}" style="background-color: #dc3545; margin-top: 5px;">
-                                Cancel
-                            </button>
+                            <form action="{{ url_for('cancel_booking', booking_id=b.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn small" style="background-color: #dc3545; margin-top: 5px;">Cancel</button>
+                              </form>
+                              
                             
                             {% endif %}
                         </td>
@@ -237,6 +255,8 @@
 
 
     <script src="{{ url_for('static', filename='cancel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
+
     
 </body>
 </html>

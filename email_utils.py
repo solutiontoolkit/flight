@@ -39,7 +39,7 @@ def send_welcome_email(user_email, user_name):
     body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.imgur.com/F6V1U6Y.png" alt="JefJet Logo" style="height: 60px;" />
+            <img src="static/img/jet_logo.jpg" alt="JefJet Logo" style="height: 60px;" />
         </div>
         <h2 style="color: #333;">Hi {user_name.title()},</h2>
         <p>Thank you for registering at <strong>JefJet Flight Bookings</strong>.</p>
@@ -60,14 +60,38 @@ def send_welcome_email(user_email, user_name):
     """
     send_email(user_email, subject, body)
 
+def send_booking_confirmation_email(user_email, user_name, booking, is_paid=False):
+    subject = f"Booking Confirmation - JefJet Flight #{booking['id']}"
+    payment_status = "PAID ✅" if is_paid else "UNPAID ❌"
+    body = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://i.imgur.com/F6V1U6Y.png" alt="JefJet Logo" style="height: 60px;" />
+            <h2 style="color: #333;">JefJet Flight Booking Confirmation</h2>
+            <p style="font-size: 16px;">Booking ID: <strong>{booking['id']}</strong> | Status: <strong>{payment_status}</strong></p>
+        </div>
+        <h3 style="color: #333;">Passenger Information:</h3>
+        <ul>
+            <li><strong>Name:</strong> {user_name.title()}</li>
+            <li><strong>Email:</strong> {user_email}</li>
+            <li><strong>NIN:</strong> {booking['nin']}</li>
+        </ul>
+        <h3 style="color: #333;">Flight Details:</h3>
+        <ul>
+            <li><strong>Departure:</strong> {booking['departure']}</li>
+            <li><strong>Destination:</strong> {booking['destination']}</li>
+            <li><strong>Date:</strong> {booking['date']}</li>
+        </ul>
+        <p style="margin-top: 30px; color: #555;">Thank you for choosing <strong>JefJet</strong>. Safe travels!</p>
+    </div>
+    """
+    send_email(user_email, subject, body)
 
-
- 
+from flask_mail import Message
+from flask import current_app
+from flask_mail import Mail
 
 def send_email_notification(user_id, booking_id, action_type):
-    # Assuming the Mail extension is initialized
-    mail = Mail()
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -81,18 +105,21 @@ def send_email_notification(user_id, booking_id, action_type):
         if action_type == "cancellation":
             subject = f"Your booking (ID: {booking_id}) has been cancelled"
             body = render_template('email/cancellation_email.html', user=user, booking_id=booking_id)
-        
-        # Send email (using flask_mail's Message class)
+
         msg = Message(subject=subject,
                       recipients=[user['email']],
-                      html=body)
+                      html=body,
+                      sender=current_app.config['MAIL_USERNAME'])
+
+        mail = Mail(current_app)
         mail.send(msg)
-    
+
     except Exception as e:
         print(f"Error sending email: {e}")
     finally:
         cursor.close()
         conn.close()
+
 
     
     
@@ -153,3 +180,97 @@ def generate_qr_code_for_payment(booking):
     qr_code_path = f"./static/qrcodes/payment_qr_{booking['id']}.png"
     qr_code.save(qr_code_path)
     return qr_code_path
+
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import qrcode
+from reportlab.lib.utils import ImageReader
+
+def generate_booking_slip_pdf(booking, pdf_path):
+    """
+    Generate a booking slip PDF with booking info and save it to pdf_path.
+    
+    booking: dict containing booking and user info, e.g.
+      {
+        'id': 123,
+        'trip_type': 'One-way',
+        'from_location': 'Lagos',
+        'to_location': 'Abuja',
+        'depart_date': '2025-06-01',
+        'return_date': None,
+        'adults': 2,
+        'children': 1,
+        'infants': 0,
+        'class_of_travel': 'Economy',
+        'airline_name': 'JefJet Airlines',
+        'name': 'Joshua',
+        'email': 'joshua@example.com',
+        'nin': '1234567890',
+        'payment_status': 'paid'  # optional
+      }
+    pdf_path: str path to save the PDF file
+    """
+
+    # Create QR code data string - could be booking reference and user email
+    qr_data = f"Booking Reference: JEF-{booking['id']}\nPassenger: {booking.get('name', 'N/A')}\nEmail: {booking.get('email', 'N/A')}"
+    qr_img = qrcode.make(qr_data)
+    qr_buffer = BytesIO()
+    qr_img.save(qr_buffer, format='PNG')
+    qr_buffer.seek(0)
+    qr_image = ImageReader(qr_buffer)
+
+    # Create PDF canvas
+    c = canvas.Canvas(pdf_path, pagesize=letter)
+
+    # Header
+    c.setFont("Helvetica-Bold", 22)
+    c.drawString(50, 750, "JEFJET Booking")
+
+    c.setFont("Helvetica", 10)
+    c.drawString(50, 735, "P.O Box 4. PTI Road Uvwie City, Delta-Nigeria")
+    c.drawString(50, 720, "Phone: (123) 456-7890")
+    c.drawString(50, 705, "Email: mukorojeffreyoghenevwegba.com")
+    c.line(50, 700, 550, 700)
+
+    # Booking Title
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(50, 680, "Customer's Booking Slip")
+
+    # Booking Info Text
+    y = 660
+    info_lines = [
+        f"Booking Reference: JEF-{booking['id']}",
+        f"Trip Type: {booking.get('trip_type', 'N/A')}",
+        f"From: {booking.get('from_location', 'N/A')}",
+        f"To: {booking.get('to_location', 'N/A')}",
+        f"Departure Date: {booking.get('depart_date', 'N/A')}",
+        f"Return Date: {booking.get('return_date', 'N/A') or 'N/A'}",
+        f"Adults: {booking.get('adults', 0)}",
+        f"Children: {booking.get('children', 0)}",
+        f"Infants: {booking.get('infants', 0)}",
+        f"Class: {booking.get('class_of_travel', 'N/A')}",
+        f"Airline: {booking.get('airline_name', 'N/A')}",
+        f"Passenger Name: {booking.get('name', 'N/A')}",
+        f"Email: {booking.get('email', 'N/A')}",
+        f"NIN: {booking.get('nin', 'N/A')}",
+    ]
+    # Optionally include payment status if exists
+    if 'payment_status' in booking:
+        info_lines.append(f"Payment Status: {booking['payment_status'].title()}")
+
+    for line in info_lines:
+        c.setFont("Helvetica", 12)
+        c.drawString(50, y, line)
+        y -= 18  # line spacing
+
+    # Draw QR code bottom right
+    c.drawImage(qr_image, 400, 550, width=150, height=150)
+    c.setFont("Helvetica-Oblique", 9)
+    c.drawString(400, 540, "Scan this code to view your booking details")
+
+    c.showPage()
+    c.save()
+
+
