@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 
 def get_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Mathematics",
-        database="jet_project"
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        ssl_ca=rf"C:\Users\Joshua.STK-PROJECT\Desktop\flight\ca.pem"
     )
 
 
@@ -19,10 +21,13 @@ load_dotenv()
 
 def get_db_connection():
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
+         host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
+        database=os.getenv("DB_NAME"),
+        ssl_ca=rf"C:\Users\Joshua.STK-PROJECT\Desktop\flight\ca.pem"
+
     )
 
 
