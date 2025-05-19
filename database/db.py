@@ -20,16 +20,14 @@ def get_connection():
 load_dotenv()
 
 def get_db_connection():
-    return mysql.connector.connect(
-         host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME"),
-        ssl_ca="C:/Users/Joshua.STK-PROJECT/Desktop/flight/ca.pem"
-
-
-    )
+    connection = mysql.connector.connect(
+    host=os.environ["DB_HOST"],
+    port=int(os.environ["DB_PORT"]),
+    user=os.environ["DB_USER"],
+    password=os.environ["DB_PASSWORD"],
+    database=os.environ["DB_NAME"],
+    ssl_ca=os.environ.get("ssl_ca")  # optional if not using SSL
+)
 
 
 
