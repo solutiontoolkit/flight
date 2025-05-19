@@ -344,19 +344,54 @@ body {
 
 
 
-.center{
+.heading-font {
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	font-size: 2rem; /* slightly smaller for better mobile fit */
+	font-weight: 900;
+	color: #fde50e; /* bright red */
+	text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+	background: rgba(255, 255, 255, 0.15); /* translucent white */
+	padding: 0.5em 1.5em;
+	border-radius: 12px;
+	animation: glow 3s ease-in-out infinite alternate;
+	max-width: 90%;
+	text-align: center;
+  }
+  
+  .center {
 	width: 100%;
 	height: 100vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	position: fixed;
-	z-index: 10;
-	color: rgb(245, 241, 241);
+	position: fixed; /* keeps text on top */
+	top: 0;
+	left: 0;
 	margin: 0;
-	font-family: Calibri, sans-serif;
-	
-}
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	z-index: 10;
+	pointer-events: none; /* so clicks pass through */
+  }
+  
+  /* Glow animation for text */
+  @keyframes glow {
+	0% {
+	  text-shadow:
+		0 0 5px #ff3b3b,
+		0 0 10px #ff3b3b,
+		0 0 20px #ff3b3b,
+		0 0 30px #ff3b3b;
+	}
+	100% {
+	  text-shadow:
+		0 0 10px #ff6969,
+		0 0 20px #ff6969,
+		0 0 30px #ff6969,
+		0 0 40px #ff6969;
+	}
+  }
+  
+
 
 p{
 	width: 70%;

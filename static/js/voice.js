@@ -133,3 +133,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const message = document.getElementById("welcome-message");
+    const closeBtn = document.getElementById("close-btn");
+
+    // Dismiss after 7 seconds
+    setTimeout(() => {
+      if (message) message.style.display = "none";
+    }, 7000);
+
+    // Manual close
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        message.style.display = "none";
+      });
+    }
+  });
+
+
