@@ -449,4 +449,12 @@ header {
   }
 }
 
+@media (max-width: 600px) {
+  /* styles for phones */
+  .container {
+    padding: 10px;
+    font-size: 1rem;
+  }
+}
+
 
