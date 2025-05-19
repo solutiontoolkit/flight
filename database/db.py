@@ -26,7 +26,8 @@ def get_db_connection():
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
-        ssl_ca=rf"C:\Users\Joshua.STK-PROJECT\Desktop\flight\ca.pem"
+        ssl_ca="C:/Users/Joshua.STK-PROJECT/Desktop/flight/ca.pem"
+
 
     )
 
