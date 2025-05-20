@@ -45,7 +45,7 @@ def send_welcome_email(user_email, user_name):
         <p>Thank you for registering at <strong>JefJet Flight Bookings</strong>.</p>
         <p>You can now log in and start booking your flights with ease.</p>
         <div style="text-align: center; margin: 30px 0;">
-            <a href="http://localhost:5000/booking" style="
+            <a href="https://flight-8oui.onrender.com/booking" style="
                 background-color: #007BFF;
                 color: white;
                 padding: 12px 24px;
