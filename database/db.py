@@ -4,30 +4,42 @@ import os
 import mysql.connector
 from dotenv import load_dotenv
 
+
+load_dotenv()  # Make sure this is correct
+
 def get_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME"),
-        ssl_ca=rf"C:\Users\Joshua.STK-PROJECT\Desktop\flight\ca.pem"
-    )
+    try:
+        conn = mysql.connector.connect(
+        host=os.environ["DB_HOST"],
+        port=int(os.environ["DB_PORT"]),
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        database=os.environ["DB_NAME"],
+        ssl_ca=os.environ.get("ssl_ca")  # optional if not using SSL
+)
+        return conn
+    except mysql.connector.Error as err:
+        print("❌ Database connection failed:", err)
+        return None
 
 
 
-
-load_dotenv()
 
 def get_db_connection():
-    connection = mysql.connector.connect(
-    host=os.environ["DB_HOST"],
-    port=int(os.environ["DB_PORT"]),
-    user=os.environ["DB_USER"],
-    password=os.environ["DB_PASSWORD"],
-    database=os.environ["DB_NAME"],
-    ssl_ca=os.environ.get("ssl_ca")  # optional if not using SSL
-)
+    try:
+        conn = mysql.connector.connect(
+                host=os.environ["DB_HOST"],
+                port=int(os.environ["DB_PORT"]),
+                user=os.environ["DB_USER"],
+                password=os.environ["DB_PASSWORD"],
+                database=os.environ["DB_NAME"],
+                ssl_ca=os.environ.get("ssl_ca") # only if you're using SSL
+        )
+        return conn
+    except mysql.connector.Error as err:
+        print("❌ Database connection failed:", err)
+        return None
+
 
 
 
@@ -78,8 +90,6 @@ def get_user_by_email(email):
     return user
 
 
-# database/db.py
-
 def get_booking_by_id(booking_id, user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -105,7 +115,6 @@ def get_booking_by_id(booking_id, user_id):
 def mark_booking_paid(booking_id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    # ✅ Always update to lowercase 'paid'
     cursor.execute("UPDATE bookings SET payment_status = 'paid' WHERE id = %s", (booking_id,))
     cursor.execute("UPDATE bookings SET status = 'PAID' WHERE id = %s", (booking_id,))
 

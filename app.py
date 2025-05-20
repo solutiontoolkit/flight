@@ -38,20 +38,27 @@ from flask_dance.contrib.facebook import facebook
 from flask_dance.contrib.linkedin import linkedin
 from itsdangerous import URLSafeTimedSerializer as Serializer, BadSignature, SignatureExpired
 from flask_login import current_user
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = os.getenv("EMAIL_ADDRESS")
-app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASSWORD")
+load_dotenv()  
+
+# Flask-Mail configuration using environment variables
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 465))  # default to 465 if not set
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'True').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.getenv('EMAIL_ADDRESS')
+app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_ADDRESS')
 
 mail = Mail(app)
 
+print("Host:", os.getenv("DB_HOST"))
+print("User:", os.getenv("DB_USER"))
 
 # Secret key for session management
 app.secret_key = os.getenv('SECRET_KEY', 'fallback-secret-key')
