@@ -67,9 +67,9 @@
                 <form action="/signup" method="POST">
                     <h1>Create Account</h1>
                     <div class="social-container">
-                        <a href="{{ url_for('facebook.login') }}" class="social"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ url_for('google.login') }}" class="social"><i class="fab fa-google-plus-g"></i></a>
-                        <a href="{{ url_for('linkedin.login') }}" class="social"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="{{ url_for('facebook.login') }}" class="social facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ url_for('google.login') }}" class="social google"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="{{ url_for('linkedin.login') }}" class="social linkedin"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                     
                     <span>or use your email for registration</span>
@@ -86,9 +86,11 @@
                 <form action="/signin" method="POST">
                     <h1>Sign in</h1>
                     <div class="social-container">
-                        <a href="{{ url_for('google.login') }}" class="social"><i class="fab fa-google"></i></a>
-                        <a href="{{ url_for('facebook.login') }}" class="social"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ url_for('linkedin.login') }}" class="social"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="{{ url_for('google.login') }}" class="social google" ><i class="fab fa-google"></i></a>
+                        <a href="{{ url_for('facebook.login') }}" class="social facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ url_for('linkedin.login') }}" class="social linkedin"><i class="fab fa-linkedin-in"></i></a>
+                        <div class="social google"></div>
+
                     </div>
                     <span>or use your account</span>
                     <input type="text" name="identifier" placeholder="Email or NIN" required />

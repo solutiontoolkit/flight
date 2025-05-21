@@ -25,20 +25,28 @@ def get_connection():
 
 
 
+import mysql.connector
+from mysql.connector import Error
+
 def get_db_connection():
     try:
         conn = mysql.connector.connect(
-                host=os.environ["DB_HOST"],
-                port=int(os.environ["DB_PORT"]),
-                user=os.environ["DB_USER"],
-                password=os.environ["DB_PASSWORD"],
-                database=os.environ["DB_NAME"],
-                ssl_ca=os.environ.get("ssl_ca") # only if you're using SSL
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            database=os.getenv('DB_NAME'),
+            port=int(os.getenv('DB_PORT', 3306)),
+            ssl_ca=os.getenv('ssl_ca')  # if used
         )
-        return conn
-    except mysql.connector.Error as err:
-        print("❌ Database connection failed:", err)
+        if conn.is_connected():
+            return conn
+        else:
+            print("❌ Database connection failed: Not connected")
+            return None
+    except Error as e:
+        print(f"❌ Database connection error: {e}")
         return None
+
 
 
 
@@ -73,9 +81,30 @@ def get_bookings(user_id):
 
     return bookings
 
+''''
+def get_user_by_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        return user
+    except Exception as e:
+        print("Error getting user by ID:", e)
+        return None
+    finally:
+        cursor.close()
+        conn.close()'''
 
 
-
+def get_user_by_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, name, email FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return user
 
 
 
@@ -121,4 +150,26 @@ def mark_booking_paid(booking_id):
     conn.commit()
     cursor.close()
     conn.close()
+
+def get_upcoming_flights(flight_date, flight_type="departure"):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    if flight_type == "departure":
+        query = """
+            SELECT * FROM bookings
+            WHERE depart_date = %s AND payment_status = 'paid'
+        """
+    else:  # return flight
+        query = """
+            SELECT * FROM bookings
+            WHERE return_date = %s AND payment_status = 'paid'
+        """
+
+    cursor.execute(query, (flight_date,))
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return bookings
+
 

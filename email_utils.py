@@ -1,15 +1,31 @@
+from datetime import datetime
 import smtplib
 import os
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask_mail import Message
-from flask import current_app, render_template
+from flask import  current_app, render_template
 from flask_mail import Mail
-
+import qrcode
+from flask_mail import Message
 from database.db import get_db_connection
+import base64
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+from flask import current_app
+from database import db
+from extensions import mail
 
-# Load environment variables from .env file
+
+def get_base64_logo():
+    logo_path = os.path.join("static", "img", "jet_logo.jpg")
+    with open(logo_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+
 load_dotenv()
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
@@ -33,6 +49,7 @@ def send_email(to_email, subject, html_content):
     except Exception as e:
         print("❌ Email send error:", e)
         raise
+
 
 def send_welcome_email(user_email, user_name):
     subject = "Welcome to JefJet Flight Bookings!"
@@ -63,10 +80,14 @@ def send_welcome_email(user_email, user_name):
 def send_booking_confirmation_email(user_email, user_name, booking, is_paid=False):
     subject = f"Booking Confirmation - JefJet Flight #{booking['id']}"
     payment_status = "PAID ✅" if is_paid else "UNPAID ❌"
+
+    # ✅ Load logo before using it
+    logo_64 = get_base64_logo()
+
     body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.imgur.com/F6V1U6Y.png" alt="JefJet Logo" style="height: 60px;" />
+            <img src="data:image/jpeg;base64,{logo_64}" alt="JefJet Logo" style="height: 60px;" />
             <h2 style="color: #333;">JefJet Flight Booking Confirmation</h2>
             <p style="font-size: 16px;">Booking ID: <strong>{booking['id']}</strong> | Status: <strong>{payment_status}</strong></p>
         </div>
@@ -78,18 +99,17 @@ def send_booking_confirmation_email(user_email, user_name, booking, is_paid=Fals
         </ul>
         <h3 style="color: #333;">Flight Details:</h3>
         <ul>
-            <li><strong>Departure:</strong> {booking['departure']}</li>
-            <li><strong>Destination:</strong> {booking['destination']}</li>
-            <li><strong>Date:</strong> {booking['date']}</li>
+            <li><strong>Departure:</strong> {booking['from_location']}</li>
+            <li><strong>Destination:</strong> {booking['to_location']}</li>
+            <li><strong>Date:</strong> {booking['depart_date']}</li>
         </ul>
         <p style="margin-top: 30px; color: #555;">Thank you for choosing <strong>JefJet</strong>. Safe travels!</p>
     </div>
     """
+
+    print(f"Sending booking email to {user_email} for booking ID {booking['id']}")
     send_email(user_email, subject, body)
 
-from flask_mail import Message
-from flask import current_app
-from flask_mail import Mail
 
 def send_email_notification(user_id, booking_id, action_type):
     conn = get_db_connection()
@@ -122,57 +142,62 @@ def send_email_notification(user_id, booking_id, action_type):
 
 
     
-    
-    import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img:
+        return base64.b64encode(img.read()).decode("utf-8")
+
+
 from flask import current_app
+from flask_mail import Message
+import os
 
-def send_payment_confirmation_email(user_id, booking, pdf_path):
-    # Fetch user details (email, name, etc.)
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT name, email FROM users WHERE id = %s", (user_id,))
-    user = cursor.fetchone()
-    cursor.close()
-    conn.close()
+def send_payment_confirmation_email(user, booking, pdf_path):
+    try:
+        print(f"Preparing to send payment confirmation email to {user['email']}")
+        print("Checking PDF existence:", os.path.exists(pdf_path))
 
-    if user:
-        sender_email = current_app.config['MAIL_USERNAME']
-        receiver_email = user['email']
-        password = current_app.config['MAIL_PASSWORD']
+        # Compose email content
+        logo_b64 = get_base64_image("static/img/jet_logo.jpg")
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+            <div style="text-align: center;">
+                <img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 60px;" />
+                <h2>Payment Confirmation</h2>
+            </div>
+            <p>Dear {user['name'].title()},</p>
+            <p>We have received your payment for the booking <strong>#{booking['id']}</strong>.</p>
+            <p>Attached is your official booking receipt.</p>
+            <p>Thank you for flying with <strong>JefJet</strong>.</p>
+        </div>
+        """
 
-        # Create message
         msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = receiver_email
-        msg['Subject'] = "Payment Confirmation for Your Booking"
+        msg['From'] = current_app.config['MAIL_USERNAME']
+        msg['To'] = user['email']
+        msg['Subject'] = f"Payment Confirmation - Booking #{booking['id']}"
+        msg.attach(MIMEText(html_content, 'html'))
 
-        body = f"Dear {user['name']},\n\nYour booking with JEFJET has been successfully paid. Please find the payment confirmation PDF attached.\n\nThank you for choosing JEFJET!"
-        msg.attach(MIMEText(body, 'plain'))
+        with open(pdf_path, "rb") as f:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(f.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f'attachment; filename=payment_confirmation_{booking["id"]}.pdf')
+            msg.attach(part)
 
-        # Attach PDF
-        attachment = open(pdf_path, "rb")
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f"attachment; filename=payment_confirmation_{booking['id']}.pdf")
-        msg.attach(part)
+        print("Connecting to SMTP server...")
+        with smtplib.SMTP_SSL(current_app.config['MAIL_SERVER'], int(current_app.config['MAIL_PORT'])) as smtp:
+            smtp.set_debuglevel(1)  # Enable SMTP debug output
+            smtp.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
+            print("Logged in successfully.")
+            smtp.send_message(msg)
+            print("Email sent successfully.")
 
-        # Send the email
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(sender_email, password)
-            text = msg.as_string()
-            server.sendmail(sender_email, receiver_email, text)
-            server.quit()
-        except Exception as e:
-            print(f"Error sending email: {e}")
+    except Exception as e:
+        print(f"❌ Failed to send payment confirmation email: {e}")
 
-import qrcode
+
+
 
 def generate_qr_code_for_payment(booking):
     payment_url = f"https://payment-url.com/{booking['id']}/paid"
@@ -273,4 +298,34 @@ def generate_booking_slip_pdf(booking, pdf_path):
     c.showPage()
     c.save()
 
+
+
+
+def send_flight_reminder_email(user, booking, flight_type="departure"):
+   
+    subject = f"Flight Reminder: Your {flight_type.title()} Flight is Tomorrow!"
+    flight_date = booking['depart_date'] if flight_type == "departure" else booking['return_date']
+
+    msg = Message(subject, recipients=[user['email']])
+    msg.body = f"""
+Hi {user.get('name', 'Traveler')},
+
+This is a friendly reminder that your {flight_type} flight is scheduled for:
+
+📍 From: {booking['from_location']}
+📍 To: {booking['to_location']}
+📅 Date: {flight_date}
+✈ Airline: {booking.get('airline_name', 'N/A')}
+🪑 Class: {booking.get('class_of_travel', 'N/A')}
+
+Booking ID: {booking.get('id')}
+
+Please arrive at the airport 2–3 hours before departure.
+
+Safe travels!
+— JEFJET Flights Team
+"""
+    print("Sending reminder for booking:", booking['id'], "to user:", user['email'])
+
+    mail.send(msg)
 

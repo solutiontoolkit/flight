@@ -1,6 +1,6 @@
 import base64
 from multiprocessing.resource_tracker import getfd
-from flask import Flask, render_template, redirect, url_for, session, request, flash, make_response
+from flask import Flask, current_app, render_template, redirect, url_for, session, request, flash, make_response
 from flask_mail import Mail, Message
 from xhtml2pdf import pisa
 from io import BytesIO
@@ -20,6 +20,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from datetime import datetime
 from database import db
+import email_utils
 
 from flask import send_file
 import qrcode
@@ -37,28 +38,36 @@ from flask_dance.contrib.google import google
 from flask_dance.contrib.facebook import facebook
 from flask_dance.contrib.linkedin import linkedin
 from itsdangerous import URLSafeTimedSerializer as Serializer, BadSignature, SignatureExpired
-from flask_login import current_user
+from flask_login import current_user, user_accessed
 from dotenv import load_dotenv
+from extensions import mail
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
+
+
 
 app = Flask(__name__)
-
-load_dotenv()  
-
-# Flask-Mail configuration using environment variables
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 465))  # default to 465 if not set
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'True').lower() == 'true'
+# your mail config here
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 465))  # use 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USERNAME'] = os.getenv('EMAIL_ADDRESS')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_ADDRESS')
 
-mail = Mail(app)
+
+
+
+
+mail.init_app(app)
 
 print("Host:", os.getenv("DB_HOST"))
 print("User:", os.getenv("DB_USER"))
+
+
+
 
 # Secret key for session management
 app.secret_key = os.getenv('SECRET_KEY', 'fallback-secret-key')
@@ -457,12 +466,7 @@ def handle_social_login(user_info):
 
 
 
-# ... [rest of your code above remains unchanged]
 
-# This version was previously duplicated and is now removed
-# def generate_reset_token(user, expires_sec=3600):
-#     s = Serializer(current_app.config['SECRET_KEY'])
-#     return s.dumps({'user_id': user['id']})
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -581,7 +585,7 @@ def booking_confirmation(booking_id):
     generate_booking_slip_pdf(booking, pdf_path)
 
     # Send email
-    user = db.get_user_by_email(session['user_id'])
+    user = db.get_user_by_id(session['user_id'])
     if user:
         is_paid = booking['payment_status'] == 'paid'
         send_booking_confirmation_email(user['email'], user['name'], booking, is_paid=is_paid)
@@ -615,6 +619,7 @@ def payment(booking_id):
 
     if booking.get('payment_status', '').lower() == 'paid':
         flash("Booking already paid.", "info")
+    
         return redirect(url_for('payment_success_page', booking_id=booking_id))
 
     return render_template('payment.html', booking=booking)
@@ -651,18 +656,36 @@ def confirm_payment(booking_id):
         return redirect(url_for('dashboard'))
 
     if booking['payment_status'] != 'paid':
-        mark_booking_paid(booking_id)
-        flash("✅ Payment successful!", "success")
+        db.mark_booking_paid(booking_id)
 
-        # Refresh booking object after update
-        booking = db.get_booking_by_id(booking_id)
-
-        user = db.get_user_by_email(session['user_id'])
+        user = db.get_user_by_id(session['user_id'])
         if user:
-            send_booking_confirmation_email(user['email'], user['name'], booking, is_paid=True)
-            flash("📧 Payment confirmation email sent!", "success")
+            pdf_path = generate_payment_pdf(booking)
+            print("✅ PDF generated at:", pdf_path)
+            print("Sending email to:", user['email'])
+            print("Using sender:", current_app.config.get('MAIL_USERNAME'))
+
+            try:
+                send_payment_confirmation_email(user, booking, pdf_path)
+                flash("✅ Payment successful!", "success")
+                flash("📧 Payment confirmation email sent!", "success")
+            except Exception as e:
+                # Log the exception and flash an error message
+                print(f"❌ Error sending payment confirmation email: {e}")
+                flash(f"❌ Payment was successful, but email could not be sent: {e}", "danger")
+        else:
+            print("❌ User not found for payment confirmation email")
+            flash("❌ User not found for sending confirmation email.", "danger")
+
+    else:
+        print("Payment was already marked as paid.")
+        flash("Payment has already been confirmed.", "info")
 
     return redirect(url_for('payment_success_page', booking_id=booking_id))
+
+
+
+
 
 
 
@@ -850,13 +873,6 @@ def cancel_booking(booking_id):
     return redirect(url_for('dashboard'))
 
 
-
-
-
-
-
-
-
 @app.route('/qr/<int:booking_id>')
 def generate_qr(booking_id):
     payment_url = url_for('payment', booking_id=booking_id, _external=True)
@@ -865,6 +881,40 @@ def generate_qr(booking_id):
     img.save(buf)
     buf.seek(0)
     return send_file(buf, mimetype='image/png')
+
+
+@app.route('/test-email')
+def test_email():
+    from flask_mail import Message
+    from app import mail  # Replace with actual mail object location
+    msg = Message(
+        subject='Test Email from Flask',
+        sender=os.getenv("EMAIL_USER"),
+        recipients=['yourpersonalemail@gmail.com'],  # Change to your test address
+        body='This is a test email. If you see this, email is working.'
+    )
+    try:
+        mail.send(msg)
+        return "✅ Email sent successfully!"
+    except Exception as e:
+        return f"❌ Email failed to send: {e}"
+    
+
+
+
+MAIL_SERVER = os.getenv('MAIL_SERVER')
+MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
+MAIL_USERNAME = os.getenv('EMAIL_ADDRESS')
+MAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
+try:
+    server = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+    server.login(MAIL_USERNAME, MAIL_PASSWORD)
+    print("SMTP connection successful!")
+    server.quit()
+except Exception as e:
+    print("SMTP connection failed:", e)
+
 
 
 
