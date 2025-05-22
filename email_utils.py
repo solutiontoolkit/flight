@@ -371,7 +371,8 @@ def send_payment_confirmation_email(user, booking, pdf_path):
             part = MIMEBase('application', 'octet-stream')
             part.set_payload(f.read())
             encoders.encode_base64(part)
-            part.add_header('Content-Disposition', f'attachment; filename=payment_confirmation_{booking['id']}.pdf')
+            part.add_header('Content-Disposition', f"attachment; filename=payment_confirmation_{booking['id']}.pdf")
+
             msg.attach(part)
 
         print("📡 Connecting to SMTP server...")
