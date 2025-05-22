@@ -30,19 +30,37 @@ from mysql.connector import Error
 
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME'),
-            port=int(os.getenv('DB_PORT', 3306)),
-            ssl_ca=os.getenv('ssl_ca')  # if used
-        )
+        host = os.getenv('DB_HOST')
+        user = os.getenv('DB_USER')
+        password = os.getenv('DB_PASSWORD')
+        database = os.getenv('DB_NAME')
+        port = int(os.getenv('DB_PORT', 3306))
+        ssl_ca = os.getenv('ssl_ca')  # This could be None or a file path
+        
+        print(f"Connecting to DB at {host}:{port} with user {user}")
+        if ssl_ca:
+            print(f"Using SSL CA certificate at: {ssl_ca}")
+        
+        conn_params = {
+            'host': host,
+            'user': user,
+            'password': password,
+            'database': database,
+            'port': port
+        }
+        
+        if ssl_ca:
+            conn_params['ssl_ca'] = ssl_ca
+        
+        conn = mysql.connector.connect(**conn_params)
+        
         if conn.is_connected():
+            print("✅ Database connected successfully.")
             return conn
         else:
             print("❌ Database connection failed: Not connected")
             return None
+    
     except Error as e:
         print(f"❌ Database connection error: {e}")
         return None

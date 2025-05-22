@@ -628,6 +628,8 @@ def payment(booking_id):
 
 
 
+from flask import session
+
 @app.route('/process_payment/<int:booking_id>', methods=['POST'])
 def process_payment(booking_id):
     card_number = request.form.get('card_number')
@@ -639,11 +641,40 @@ def process_payment(booking_id):
         flash("Please fill all payment details.", "danger")
         return redirect(url_for('payment', booking_id=booking_id))
 
-    # Process as normal
+    # Mark booking as paid
     db.mark_booking_paid(booking_id)
-    flash('Payment successful!', 'success')
+
+    # Get user_id from session
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("User not logged in.", "danger")
+        return redirect(url_for('login'))
+
+    # Get booking with both booking_id and user_id
+    booking = db.get_booking(booking_id, user_id)
+    if not booking:
+        flash("Booking not found.", "danger")
+        return redirect(url_for('dashboard'))
+
+    # Get user info
+    user = db.get_user_by_id(user_id)
+
+    if user and booking:
+        try:
+            pdf_path = generate_payment_pdf(booking)  # Make sure this function exists
+            send_payment_confirmation_email(user, booking, pdf_path)
+            flash("📧 Payment confirmation email sent!", "success")
+        except Exception as e:
+            print(f"❌ Failed to send payment email: {e}")
+            flash("❌ Payment was successful but email failed to send.", "warning")
+
+    flash('✅ Payment successful!', 'success')
     return redirect(url_for('payment_success_page', booking_id=booking_id))
 
+
+
+
+from daily_reminder import maybe_send_reminder_for_booking
 
 @app.route('/payment_confirm/<int:booking_id>', methods=['POST'])
 def confirm_payment(booking_id):
@@ -662,26 +693,25 @@ def confirm_payment(booking_id):
         if user:
             pdf_path = generate_payment_pdf(booking)
             print("✅ PDF generated at:", pdf_path)
-            print("Sending email to:", user['email'])
-            print("Using sender:", current_app.config.get('MAIL_USERNAME'))
 
             try:
                 send_payment_confirmation_email(user, booking, pdf_path)
                 flash("✅ Payment successful!", "success")
                 flash("📧 Payment confirmation email sent!", "success")
-            except Exception as e:
-                # Log the exception and flash an error message
-                print(f"❌ Error sending payment confirmation email: {e}")
-                flash(f"❌ Payment was successful, but email could not be sent: {e}", "danger")
-        else:
-            print("❌ User not found for payment confirmation email")
-            flash("❌ User not found for sending confirmation email.", "danger")
 
+                # 🟢 Send reminder if the flight is tomorrow
+                maybe_send_reminder_for_booking(booking)
+
+            except Exception as e:
+                print(f"❌ Email error: {e}")
+                flash(f"❌ Email send failed: {e}", "danger")
+        else:
+            flash("❌ User not found.", "danger")
     else:
-        print("Payment was already marked as paid.")
         flash("Payment has already been confirmed.", "info")
 
     return redirect(url_for('payment_success_page', booking_id=booking_id))
+
 
 
 
@@ -883,40 +913,22 @@ def generate_qr(booking_id):
     return send_file(buf, mimetype='image/png')
 
 
-@app.route('/test-email')
-def test_email():
-    from flask_mail import Message
-    from app import mail  # Replace with actual mail object location
-    msg = Message(
-        subject='Test Email from Flask',
-        sender=os.getenv("EMAIL_USER"),
-        recipients=['yourpersonalemail@gmail.com'],  # Change to your test address
-        body='This is a test email. If you see this, email is working.'
-    )
-    try:
-        mail.send(msg)
-        return "✅ Email sent successfully!"
-    except Exception as e:
-        return f"❌ Email failed to send: {e}"
-    
+with app.app_context():
+    print("MAIL_USERNAME:", current_app.config.get("MAIL_USERNAME"))
+    print("MAIL_PASSWORD:", current_app.config.get("MAIL_PASSWORD"))
 
 
 
-MAIL_SERVER = os.getenv('MAIL_SERVER')
-MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
-MAIL_USERNAME = os.getenv('EMAIL_ADDRESS')
-MAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-
-try:
-    server = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
-    server.login(MAIL_USERNAME, MAIL_PASSWORD)
-    print("SMTP connection successful!")
-    server.quit()
-except Exception as e:
-    print("SMTP connection failed:", e)
-
-
+if __name__ == "__main__":
+    with app.app_context():
+        from daily_reminder import send_daily_reminders
+        print("🔄 Running daily reminder check at startup...")
+        send_daily_reminders()
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    app.run(debug=True, use_reloader=False)  # Disable reloader for single run
+

@@ -4,20 +4,25 @@ import os
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask_mail import Message
-from flask import  current_app, render_template
-from flask_mail import Mail
-import qrcode
-from flask_mail import Message
+from flask import current_app, render_template
+from flask_mail import Mail, Message
 from database.db import get_db_connection
+from database import db
+from extensions import mail
+
 import base64
+import qrcode
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from flask import current_app
-from database import db
-from extensions import mail
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from io import BytesIO
+
 
 
 def get_base64_logo():
@@ -147,18 +152,21 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as img:
         return base64.b64encode(img.read()).decode("utf-8")
 
-
-from flask import current_app
-from flask_mail import Message
-import os
-
 def send_payment_confirmation_email(user, booking, pdf_path):
     try:
-        print(f"Preparing to send payment confirmation email to {user['email']}")
-        print("Checking PDF existence:", os.path.exists(pdf_path))
+        if not user or 'email' not in user:
+            print("❌ No valid user email provided.")
+            return
 
-        # Compose email content
+        if not os.path.exists(pdf_path):
+            print(f"❌ PDF not found at: {pdf_path}")
+            return
+
+        print(f"📤 Preparing to send payment confirmation email to {user['email']}")
+
+        # Load and encode logo image
         logo_b64 = get_base64_image("static/img/jet_logo.jpg")
+
         html_content = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
             <div style="text-align: center;">
@@ -173,7 +181,12 @@ def send_payment_confirmation_email(user, booking, pdf_path):
         """
 
         msg = MIMEMultipart()
-        msg['From'] = current_app.config['MAIL_USERNAME']
+        sender = current_app.config.get('MAIL_USERNAME') or os.getenv('EMAIL_ADDRESS')
+        password = current_app.config.get('MAIL_PASSWORD') or os.getenv('EMAIL_PASSWORD')
+        smtp_server = current_app.config.get('MAIL_SERVER', 'smtp.gmail.com')
+        smtp_port = int(current_app.config.get('MAIL_PORT', 465))
+
+        msg['From'] = sender
         msg['To'] = user['email']
         msg['Subject'] = f"Payment Confirmation - Booking #{booking['id']}"
         msg.attach(MIMEText(html_content, 'html'))
@@ -185,16 +198,16 @@ def send_payment_confirmation_email(user, booking, pdf_path):
             part.add_header('Content-Disposition', f'attachment; filename=payment_confirmation_{booking["id"]}.pdf')
             msg.attach(part)
 
-        print("Connecting to SMTP server...")
-        with smtplib.SMTP_SSL(current_app.config['MAIL_SERVER'], int(current_app.config['MAIL_PORT'])) as smtp:
-            smtp.set_debuglevel(1)  # Enable SMTP debug output
-            smtp.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
-            print("Logged in successfully.")
+        print(f"📡 Connecting to SMTP server {smtp_server}:{smtp_port}...")
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as smtp:
+            smtp.set_debuglevel(1)
+            smtp.login(sender, password)
             smtp.send_message(msg)
-            print("Email sent successfully.")
+            print(f"✅ Payment confirmation email sent to {user['email']}")
 
     except Exception as e:
         print(f"❌ Failed to send payment confirmation email: {e}")
+
 
 
 
@@ -207,11 +220,7 @@ def generate_qr_code_for_payment(booking):
     return qr_code_path
 
 
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from io import BytesIO
-import qrcode
-from reportlab.lib.utils import ImageReader
+
 
 def generate_booking_slip_pdf(booking, pdf_path):
     """
@@ -298,9 +307,87 @@ def generate_booking_slip_pdf(booking, pdf_path):
     c.showPage()
     c.save()
 
+def send_flight_reminder_email(user, booking, flight_type="departure"):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = current_app.config.get('MAIL_USERNAME')
+        msg['To'] = user['email']
+        msg['Subject'] = f"Reminder: Your {flight_type.capitalize()} Flight is Tomorrow"
+
+        html = f"""
+        <p>Hi {user['name'].title()},</p>
+        <p>This is a reminder that your <strong>{flight_type}</strong> flight is scheduled for tomorrow.</p>
+        <p>Booking ID: {booking['id']}</p>
+        <p>Thank you for choosing <strong>JefJet</strong>.</p>
+        """
+
+        msg.attach(MIMEText(html, 'html'))
+
+        print("📡 Connecting to SMTP server for reminder...")
+        with smtplib.SMTP_SSL(current_app.config.get('MAIL_SERVER'), int(current_app.config.get('MAIL_PORT'))) as smtp:
+            smtp.login(current_app.config.get('MAIL_USERNAME'), current_app.config.get('MAIL_PASSWORD'))
+            smtp.send_message(msg)
+            print(f"✅ Reminder email sent to {user['email']} for {flight_type} flight")
+
+    except Exception as e:
+        import traceback
+        print("❌ Error sending reminder email:")
+        traceback.print_exc()
 
 
 
+def get_base64_image(img_path):
+    if not os.path.exists(img_path):
+        return ''
+    with open(img_path, 'rb') as image_file:
+        return b64encode(image_file.read()).decode('utf-8')
+
+def send_payment_confirmation_email(user, booking, pdf_path):
+    try:
+        print(f"Preparing to send payment confirmation email to {user['email']}")
+        print("Checking PDF existence:", os.path.exists(pdf_path))
+
+        logo_b64 = get_base64_image("static/img/jet_logo.jpg")
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+            <div style="text-align: center;">
+                <img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 60px;" />
+                <h2>Payment Confirmation</h2>
+            </div>
+            <p>Dear {user['name'].title()},</p>
+            <p>We have received your payment for the booking <strong>#{booking['id']}</strong>.</p>
+            <p>Attached is your official booking receipt.</p>
+            <p>Thank you for flying with <strong>JefJet</strong>.</p>
+        </div>
+        """
+
+        msg = MIMEMultipart()
+        msg['From'] = current_app.config.get('MAIL_USERNAME')
+        msg['To'] = user['email']
+        msg['Subject'] = f"Payment Confirmation - Booking #{booking['id']}"
+        msg.attach(MIMEText(html_content, 'html'))
+
+        with open(pdf_path, "rb") as f:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(f.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f'attachment; filename=payment_confirmation_{booking['id']}.pdf')
+            msg.attach(part)
+
+        print("📡 Connecting to SMTP server...")
+        with smtplib.SMTP_SSL(current_app.config.get('MAIL_SERVER'), int(current_app.config.get('MAIL_PORT'))) as smtp:
+            smtp.login(current_app.config.get('MAIL_USERNAME'), current_app.config.get('MAIL_PASSWORD'))
+            print("✅ SMTP login successful.")
+            smtp.send_message(msg)
+            print("✅ Payment confirmation email sent to", user['email'])
+
+    except Exception as e:
+        import traceback
+        print("❌ Exception during sending payment email:")
+        traceback.print_exc()
+
+
+'''
 def send_flight_reminder_email(user, booking, flight_type="departure"):
    
     subject = f"Flight Reminder: Your {flight_type.title()} Flight is Tomorrow!"
@@ -328,4 +415,4 @@ Safe travels!
     print("Sending reminder for booking:", booking['id'], "to user:", user['email'])
 
     mail.send(msg)
-
+'''

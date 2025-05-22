@@ -1,124 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Book a Flight</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bookin.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="UTF-8">
+  <title>Book a Flight</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bookin.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-    <script type="module" src="{{ url_for('static', filename='js/voice.js') }}"></script>
-    <form action="{{ url_for('submit_booking') }}" method="post" class="trip-form">
 
-        <fieldset class="radio-group">
-            <label><input type="radio" name="trip_type" value="oneWay"> One Way</label>
-            <label><input type="radio" name="trip_type" value="roundTrip" checked> Round trip</label>
-            <label><input type="radio" name="trip_type" value="multiCity"> Multi City</label>
-        </fieldset>
+  <script type="module" src="{{ url_for('static', filename='js/voice.js') }}"></script>
 
-        <fieldset>
-            <div class="group-field">
-                <label>From</label>
-                <select name="from_location">
-                    <option value="Warri">Osubi (Warri)</option>
-                    <option value="Lagos">Murtala M. Lagos</option>
-                    <option value="Kaduna">Amadu Bello (Kaduna)</option>
-                    <option value="Abuja">Nnamdi Azik(Abuja)</option>
-                    <option value="Port Harcourt">Port Harcourt</option>
-                    <option value="onitsha">Onitsha</option>
-                    <option value="katsina">Katsina</option>
-                    <option value="kogi">Kogi</option>
-                    <option value="ilorin">Ilorin</option>
-                    <option value="yobe">Yobe</option>
-                    <option value="benin">Benin</option>
-                    <option value="Kano">Kano</option>
-                    <option value="jos">Jos</option>
-                </select>
-            </div>
-            <div class="group-field">
-                <label>To</label>
-                <select name="to_location">
-                    <option value="Lagos">Lagos</option>
-                    <option value="Abuja">Abuja</option>
-                    <option value="Port Harcourt">Port Harcourt</option>
-                    <option value="onitsha">Onitsha</option>
-                    <option value="Kano">Kano</option>
-                    <option value="katsina">Katsina</option>
-                    <option value="kogi">Kogi</option>
-                    <option value="ilorin">Ilorin</option>
-                    <option value="yobe">Yobe</option>
-                    <option value="benin">Benin</option>
-                    <option value="jos">Jos</option>
+  <form action="{{ url_for('submit_booking') }}" method="post" class="trip-form">
 
-                </select>
-            </div>
-        </fieldset>
+    <fieldset class="radio-group" data-tippy-content="Choose your trip type">
+      <label><input type="radio" name="trip_type" value="oneWay"> One Way</label>
+      <label><input type="radio" name="trip_type" value="roundTrip" checked> Round trip</label>
+      <label><input type="radio" name="trip_type" value="multiCity"> Multi City</label>
+    </fieldset>
 
-        <fieldset>
-            <div class="group-field">
-                <label>Depart on</label>
-                <input type="date" name="depart_date">
-            </div>
-            <div class="group-field">
-                <label>Return on</label>
-                <input type="date" name="return_date">
-            </div>
-        </fieldset>
+    <fieldset>
+      <div class="group-field">
+        <label data-tippy-content="Choose your departure location">From</label>
+        <select name="from_location" data-tippy-content="Select airport of origin">
+          <option value="Warri">Osubi (Warri)</option>
+          <option value="Lagos">Murtala M. Lagos</option>
+          <option value="Kaduna">Amadu Bello (Kaduna)</option>
+          <option value="Abuja">Nnamdi Azik(Abuja)</option>
+          <option value="Port Harcourt">Port Harcourt</option>
+          <option value="onitsha">Onitsha</option>
+          <option value="katsina">Katsina</option>
+          <option value="kogi">Kogi</option>
+          <option value="ilorin">Ilorin</option>
+          <option value="yobe">Yobe</option>
+          <option value="benin">Benin</option>
+          <option value="Kano">Kano</option>
+          <option value="jos">Jos</option>
+        </select>
+      </div>
 
-        <fieldset>
-            <div class="group-select-field">
-                <label>Adults</label>
-                <select name="adults">
-                    {% for i in range(1, 6) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="group-select-field">
-                <label>Children</label>
-                <select name="children">
-                    {% for i in range(0, 6) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                    {% endfor %}
-                </select>
-                <label class="label-hint">2–11 years</label>
-            </div>
-            <div class="group-select-field">
-                <label>Infants</label>
-                <select name="infants">
-                    {% for i in range(0, 6) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                    {% endfor %}
-                </select>
-                <label class="label-hint">Below 2 yrs</label>
-            </div>
-        </fieldset>
+      <div class="group-field">
+        <label data-tippy-content="Choose your destination">To</label>
+        <select name="to_location" data-tippy-content="Select your arrival city">
+          <option value="Lagos">Lagos</option>
+          <option value="Abuja">Abuja</option>
+          <option value="Port Harcourt">Port Harcourt</option>
+          <option value="onitsha">Onitsha</option>
+          <option value="Kano">Kano</option>
+          <option value="katsina">Katsina</option>
+          <option value="kogi">Kogi</option>
+          <option value="ilorin">Ilorin</option>
+          <option value="yobe">Yobe</option>
+          <option value="benin">Benin</option>
+          <option value="jos">Jos</option>
+        </select>
+      </div>
+    </fieldset>
 
-        <fieldset class="more-option">
-            <details>
-                <summary><b>More options: </b>Class of travel, Airline Preference</summary>
-                <div class="group-field">
-                    <label>Class of travel</label>
-                    <select name="class_of_travel">
-                        <option value="Economy">Economy</option>
-                        <option value="Business">Business</option>
-                        <option value="First Class">First Class</option>
-                    </select>
-                </div>
-                <div class="group-field">
-                    <label>Preferred Airline</label>
-                    <input type="text" name="airline_name" placeholder="Airline name">
-                </div>
-            </details>
-        </fieldset>
+    <fieldset>
+      <div class="group-field">
+        <label data-tippy-content="Select your departure date">Depart on</label>
+        <input type="date" name="depart_date" data-tippy-content="Pick a departure date">
+      </div>
+      <div class="group-field">
+        <label data-tippy-content="Select your return date">Return on</label>
+        <input type="date" name="return_date" data-tippy-content="Pick a return date">
+      </div>
+    </fieldset>
 
-        <button type="submit" class="search-btn">Submit</button>
-        <a href="{{ url_for('dashboard') }}" class="return-btn">Back to Dashboard</a>
+    <fieldset>
+      <div class="group-select-field">
+        <label data-tippy-content="Number of adult passengers">Adults</label>
+        <select name="adults" data-tippy-content="Select number of adults">
+          {% for i in range(1, 6) %}
+          <option value="{{ i }}">{{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="group-select-field">
+        <label data-tippy-content="Number of children (2–11 years)">Children</label>
+        <select name="children" data-tippy-content="Select number of children">
+          {% for i in range(0, 6) %}
+          <option value="{{ i }}">{{ i }}</option>
+          {% endfor %}
+        </select>
+        <label class="label-hint">2–11 years</label>
+      </div>
+      <div class="group-select-field">
+        <label data-tippy-content="Number of infants (below 2 years)">Infants</label>
+        <select name="infants" data-tippy-content="Select number of infants">
+          {% for i in range(0, 6) %}
+          <option value="{{ i }}">{{ i }}</option>
+          {% endfor %}
+        </select>
+        <label class="label-hint">Below 2 yrs</label>
+      </div>
+    </fieldset>
 
-    </form>
-    
+    <fieldset class="more-option" data-tippy-content="Expand to select class and airline preference">
+      <details>
+        <summary><b>More options: </b>Class of travel, Airline Preference 🧑‍💻</summary>
+        <div class="group-field">
+          <label data-tippy-content="Choose travel class">Class of travel</label>
+          <select name="class_of_travel" data-tippy-content="Economy, Business or First Class">
+            <option value="Economy">Economy</option>
+            <option value="Business">Business</option>
+            <option value="First Class">First Class</option>
+          </select>
+        </div>
+        <div class="group-field">
+          <label data-tippy-content="Enter your preferred airline name">Preferred Airline</label>
+          <input type="text" name="airline_name" placeholder="Airline name" data-tippy-content="Type an airline name (optional)">
+        </div>
+      </details>
+    </fieldset>
+
+    <a href="{{ url_for('dashboard') }}" class="return-btn" data-tippy-content="Go back to your dashboard">Back to Dashboard</a>
+    <button type="submit" class="search-btn" data-tippy-content="Submit your flight booking">Submit</button>
+  </form>
+
+  <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <!-- Tippy.js activation -->
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+  <script>
+    tippy('[data-tippy-content]', {
+      animation: 'scale',
+      theme: 'custom',
+      delay: [100, 100],
+    });
+  </script>
+  
+
 </body>
 </html>

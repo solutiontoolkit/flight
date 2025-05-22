@@ -99,9 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const inputs = document.querySelectorAll(
         '.sign-in-container input, .sign-up-container input, ' +
-        '.trip-form input[type="text"], .trip-form input[type=\"date\"], .trip-form select, ' +
+        '.trip-form input[type="text"], .trip-form input[type="date"], .trip-form select, ' +
         '.form-container input, .form-container select'
       );
+      console.log("Voice input targets:", inputs);
+      
       
     
     inputs.forEach(input => {
