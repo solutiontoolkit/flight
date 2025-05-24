@@ -6,6 +6,7 @@ from xhtml2pdf import pisa
 from io import BytesIO
 import bcrypt
 import os
+from daily_reminder import maybe_send_reminder_for_booking
 import database.db
 from dotenv import load_dotenv
 import qrcode
@@ -21,7 +22,7 @@ from reportlab.pdfgen import canvas
 from datetime import datetime
 from database import db
 import email_utils
-
+from email_utils import send_flight_reminder_email
 from flask import send_file
 import qrcode
 import base64
@@ -674,7 +675,7 @@ def process_payment(booking_id):
 
 
 
-from daily_reminder import maybe_send_reminder_for_booking
+
 
 @app.route('/payment_confirm/<int:booking_id>', methods=['POST'])
 def confirm_payment(booking_id):
@@ -917,7 +918,9 @@ with app.app_context():
     print("MAIL_USERNAME:", current_app.config.get("MAIL_USERNAME"))
     print("MAIL_PASSWORD:", current_app.config.get("MAIL_PASSWORD"))
 
-
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html')
 
 if __name__ == "__main__":
     with app.app_context():

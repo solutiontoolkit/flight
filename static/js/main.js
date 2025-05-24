@@ -115,3 +115,16 @@ for(let i = 0; i < length; i++)
 {
 	text.children[i].style['animation-delay'] = animationDelay * i + 'ms';
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+	const closeBtn = document.getElementById('close-btn');
+	const message = document.getElementById('welcome-message');
+  
+	if (closeBtn && message) {
+	  closeBtn.addEventListener('click', function () {
+		message.style.display = 'none';
+	  });
+	}
+  });
+  

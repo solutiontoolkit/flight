@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Media Galleries</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">JEFJET</div>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li class="dropdown">
+      <a href="#">Video ▾</a>
+      <div class="dropdown-menu">
+        <a href="#">Download</a>
+        <a href="#">Upload</a>
+      </div>
+    </li>
+    <li><a href="#">Watch</a></li>
+    <li><a href="#">Contact Us</a></li>
+  </ul>
+</nav>
+
+<!-- VIDEO GALLERY -->
+<h2 class="section-heading">Video Gallery</h2>
+<section class="card-grid" id="video-gallery">
+
+  <div class="card">
+    <div class="image-box">
+      <video src="{{ url_for('static', filename='videos/screenRec.mp4') }}" muted loop playsinline></video>
+      <div class="play-button"></div>
+      <div class="overlay-text">Voice Booking</div>
+    </div>
+    <img src="{{ url_for('static', filename='images/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Voice Booking Video</h2>
+    <p>Book flight Successfully.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <video src="{{ url_for('static', filename='videos/record2.mp4') }}" muted loop playsinline></video>
+      <div class="play-button"></div>
+      <div class="overlay-text">Downloads</div>
+    </div>
+    <img src="{{ url_for('static', filename='images/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Download Bookings</h2>
+    <p>How to download your bookings / paid bookings.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <video src="{{ url_for('static', filename='videos/video2.mp4') }}" muted loop></video>
+      <div class="play-button"></div>
+      <div class="overlay-text">Contact</div>
+    </div>
+    <img src="{{ url_for('static', filename='images/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Contact Us</h2>
+    <p>Quick contact video.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <video src="{{ url_for('static', filename='videos/video2.mp4') }}" muted loop></video>
+      <div class="play-button"></div>
+      <div class="overlay-text">Student Life</div>
+    </div>
+    <img src="{{ url_for('static', filename='img/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Student Watch</h2>
+    <p>Amazing videos.</p>
+  </div>
+
+</section>
+
+
+<!-- IMAGE GALLERY -->
+<h2 class="section-heading">Available Airline Points</h2>
+<section class="card-grid" id="image-gallery">
+  <div class="card">
+    <div class="image-box">
+      <img src="{{ url_for('static', filename='img/asaba_airport.jpg') }}" alt="Image 1"/>
+      <div class="overlay-text s">🌟🌟🌟🌟🌟</div>
+    </div>
+    <img src="{{ url_for('static', filename='img/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Asaba Airport</h2>
+    <p>Amazing airconditional Flights.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <img src="{{ url_for('static', filename='img/air1.jpg') }}" alt="Image 2"/>
+      <div class="overlay-text">Mountain Trail</div>
+    </div>
+    <img src="{{ url_for('static', filename='img/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Osubi Warri Airport</h2>
+    <p>Peaceful nature trail experience.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <img src="{{ url_for('static', filename='img/air3.jpg') }}" alt="Image 3"/>
+      <div class="overlay-text">Mountain Trail</div>
+    </div>
+    <img src="{{ url_for('static', filename='img/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Kaduna Airport</h2>
+    <p>Peaceful nature trail experience.</p>
+  </div>
+
+  <div class="card">
+    <div class="image-box">
+      <img src="{{ url_for('static', filename='img/air2.jpg') }}" alt="Image 4"/>
+      <div class="overlay-text">Mountain Trail</div>
+    </div>
+    <img src="{{ url_for('static', filename='img/nigeria_flag.jpg') }}" class="logo" />
+    <h2>Owerri Airport</h2>
+    <p>Peaceful nature trail experience.</p>
+  </div>
+</section>
+
+
+
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="social-icons">
+      <a href="#" title="Facebook">
+        <img src="{{ url_for('static', filename='img/facebook_icon.jpg') }}" alt="Facebook" width="24" height="24">
+      </a>
+      <a href="#" title="LinkedIn">
+        <img src="{{ url_for('static', filename='img/linkedin.png') }}" alt="LinkedIn" width="24" height="24">
+      </a>
+      <a href="#" title="X">
+        <img src="{{ url_for('static', filename='img/X_logo.jpg') }}" alt="Twitter" width="24" height="24">
+      </a>
+      <a href="#" title="YouTube">
+        <img src="{{ url_for('static', filename='img/youtube_logo.jpg') }}" alt="YouTube" width="24" height="24">
+      </a>
+    </div>
+  
+    <div class="footer-info">
+      &copy; Since 2025 Mukoro Jeffrey |
+      Email: <a href="mailto:mukorojeffreyoghenevwegba@gmail.com">mukorojeffreyoghenevwegba@gmail.com</a><br>
+      pti/m23/csit/ng
+    </div>
+  </footer>
+  
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

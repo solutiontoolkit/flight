@@ -7,84 +7,107 @@
     <title>HOME</title>
 
     <!-- Fonts -->
-    <link href="http://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&display=swap" rel="stylesheet">
-    <link href='https://fonts.googleapis.com/css?family=Playfair+Display:400,700,700italic' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
-
 <body>
-
-    <div id="welcome-message" class="floating-message">
-        <span>Welcome! Click the <strong>'Proceed to Booking'</strong> button if you want a flight.</span>
-        <button id="close-btn" class="close-btn">&times;</button>
+    <div class="slideshow-background">
+        <img src="{{ url_for('static', filename='img/flight-bg1.jpg') }}" class="bg-slide" />
+        <img src="{{ url_for('static', filename='img/flight-bg2.jpg') }}" class="bg-slide" />
+        <img src="{{ url_for('static', filename='img/flight-bg3.jpg') }}" class="bg-slide" />
+        <img src="{{ url_for('static', filename='img/flight-bg.jpg') }}" class="bg-slide" />
       </div>
       
+    <div class="animated-background">
+        <!-- Jets flying -->
+        <svg class="jet jet1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 30 L62 2 L50 30 L62 58 L2 30 Z"/>
+        </svg>
+        <svg class="jet jet2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 30 L62 2 L50 30 L62 58 L2 30 Z"/>
+        </svg>
+        <svg class="jet jet3" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 30 L62 2 L50 30 L62 58 L2 30 Z"/>
+        </svg>
+    </div>
+
+    <div class="particles">
+        <div class="particle" style="top:10%; left:15%; animation-delay: 0s;"></div>
+        <div class="particle" style="top:50%; left:40%; animation-delay: 2s;"></div>
+        <div class="particle" style="top:30%; left:80%; animation-delay: 4s;"></div>
+        <div class="particle" style="top:70%; left:60%; animation-delay: 1.5s;"></div>
+        <div class="particle" style="top:85%; left:25%; animation-delay: 3.5s;"></div>
+      </div>
       
-    <div class="world" id="world"></div>
-
-	<nav>
-		<ul class="cd-primary-nav">
-		  <li><a href="{{ url_for('home') }}">HOME</a></li>
-		  <li><a href="{{ url_for('booking') }}">BOOK NOW</a></li>
-		  <li><a href="{{ url_for('account') }}">ACCOUNT</a></li>
-		  <li><a href="{{ url_for('dashboard') }}">DASHBOARD</a></li>
-		  <li><a href="{{ url_for('payment', booking_id=1) }}">Pending Payment</a></li>
-		  <li><a href="{{ url_for('contact') }}">CONTACT US</a></li>
-		</ul>
-	  </nav>
-	  
-	
-	
-
-    <div class="cd-overlay-nav"><span></span></div>
-    <div class="cd-overlay-content"><span></span></div>
-
-    <a href="#0" class="cd-nav-trigger">Menu<span class="cd-icon"></span></a>
-
-    <form class="searchform cf">
-        <input type="text" placeholder="Is it me you’re looking for?">
-        <button type="submit">Search</button>
-    </form>
-
-    <div class="bttn">
-        <form action="{{ url_for('signin') }}" method="get">
-            <button type="submit" class="btn btn--stripe btn--radius">PROCEED TO BOOKING</button>
-        </form>
-    </div>
     
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="{{ url_for('static', filename='img/jet_logo.jpg') }}" alt="JefJet Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('booking') }}">Book Now</a></li>
+            <li><a href="{{ url_for('account') }}">Account</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('payment', booking_id=1) }}">Payment</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            <li><a href="{{ url_for('gallery') }}">How to Book</a></li>
+        </ul>
+    </nav>
 
-    <div class="svgg">
-        <!-- logo div -->
-        <!-- your svg/logo code should go here -->
+    <div class="background-overlay">
+        <div class="center-content">
+          <p id="main-heading" class="main-heading">
+            ENJOY YOUR JOURNEY WITH JEFJET BOOKING FLIGHT
+          </p>
+          <form action="{{ url_for('booking') }}" method="get">
+            <div class="tooltip">
+              <button type="submit" class="btn btn--stripe btn--radius">
+                PROCEED TO BOOKING
+              </button>
+              <span class="tooltiptext">
+                Click here to start your flight booking process
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+        <div class="voice-book-logo">
+            <img src="{{ url_for('static', filename='img/voice-book.jpg') }}" alt="Voice-Book Logo">
+        </div>
     </div>
 
-    <div class="center">
-        <p id="text" class="heading-font">ENJOY YOUR JOURNEY WITH JEFJET BOOKING FLIGHT</p>
-    </div>
+    <footer class="footer">
+        <div class="social-icons">
+            <a href="#" title="Facebook">
+                <img src="{{ url_for('static', filename='img/facebook_icon.jpg') }}" alt="Facebook" width="24" height="24">
+            </a>
+            <a href="#" title="LinkedIn">
+                <img src="{{ url_for('static', filename='img/linkedin.png') }}" alt="LinkedIn" width="24" height="24">
+            </a>
+            <a href="#" title="X">
+                <img src="{{ url_for('static', filename='img/X_logo.jpg') }}" alt="Twitter" width="24" height="24">
+            </a>
+            <a href="#" title="YouTube">
+                <img src="{{ url_for('static', filename='img/youtube_logo.jpg') }}" alt="YouTube" width="24" height="24">
+            </a>
+        </div>
+        <div class="footer-info">
+            &copy; Since 2025 Mukoro Jeffrey |
+            Email: <a href="mailto:mukorojeffreyoghenevwegba@gmail.com">mukorojeffreyoghenevwegba@gmail.com</a><br>
+            pti/m23/csit/ng
+        </div>
+    </footer>
 
-
-
-
-
-
-    
-
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/velocity.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-
-
-
-
+    <script>
+        document.getElementById('close-btn')?.addEventListener('click', function () {
+            document.getElementById('welcome-message').style.display = 'none';
+        });
+    </script>
+    <script src="{{ url_for('static', filename='tooltip.js') }}"></script>
 </body>
-
 </html>

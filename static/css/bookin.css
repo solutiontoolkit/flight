@@ -3,7 +3,7 @@ form {
   max-width: 920px;
   margin: 40px auto;
   padding: 40px 20px;
-  background: linear-gradient(to right, rgb(35, 38, 209) 5%, #1bc4ca 95%);
+  background: linear-gradient(to right, rgb(35, 38, 209) 5%, #086568 95%);
   position: relative;
   z-index: 11;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

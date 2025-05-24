@@ -1,0 +1,119 @@
+/* Reset default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Container styles */
+  .container-home {
+    width: 600px;
+    height: 100vh;
+    display: flex;               /* Added to enable flex children */
+    justify-content: center;     /* Center child horizontally */
+    align-items: center;         /* Center child vertically */
+    color: hwb(180 4% 10%);
+    background: #0881d8;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f4f8;
+    text-align: center;
+  }
+  
+
+  /* Heading */
+  .heading {
+    font-size: 2.5rem;
+    color: #0f95ee;
+    margin-bottom: 20px;
+  }
+  
+  /* Paragraph */
+  .description {
+    font-size: 1.2rem;
+    color: hwb(0 5% 18%);
+    margin-bottom: 30px;
+  }
+  
+  /* Button */
+  .my-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    background-color: #0881d8;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .my-button:hover {
+    background-color: #005fa3;
+  }
+  
+
+
+
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 4px;
+    padding: 5px;
+  }
+  
+  .card {
+  position: relative;
+  width: 280px;   /* fixed card width */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  padding: 5px;
+  text-align: center;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+  .card .main-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  
+  .card .logo {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    border-radius: 50%;
+    background: white;
+    padding: 5px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    object-fit: contain;
+  }
+  
+  .card h2 {
+    margin: 15px 0 8px;
+    font-size: 1.25rem;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .image-box {
+    width: 100%;
+    height: 180px;        /* fixed height */
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+  }

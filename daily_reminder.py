@@ -3,6 +3,8 @@ from datetime import date, timedelta
 from database.db import get_upcoming_flights, get_user_by_id
 from email_utils import send_flight_reminder_email
 
+
+
 def send_daily_reminders():
     tomorrow = date.today() + timedelta(days=1)
 
@@ -23,7 +25,7 @@ def send_daily_reminders():
 
 if __name__ == "__main__":
     with app.app_context():
-        send_daily_reminders()
+        send_daily_reminders() 
 
 
 

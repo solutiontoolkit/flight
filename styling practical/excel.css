@@ -1,0 +1,51 @@
+.card {
+    position: relative;
+    width: 280px;   /* fixed card width */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    padding: 15px;
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  
+  .image-box {
+    width: 100%;
+    height: 180px;        /* fixed height */
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  
+  .main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;     /* image covers entire box, cropping if needed */
+    transition: transform 0.4s ease;
+    display: block;
+  }
+  
+  .logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    padding: 5px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    object-fit: contain;
+  }
+  
+  .card:hover {
+    transform: translateY(-8px);
+  }
+  
+  .card:hover .main-image {
+    transform: scale(1.1);  /* zoom effect on hover */
+    filter: brightness(1.1); /* slightly brighter */
+  }
+  

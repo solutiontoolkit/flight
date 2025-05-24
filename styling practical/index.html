@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Media Galleries</title>
+  <style>
+    /* RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #00aaff, #00ffaa, #aa00ff, #ff5500);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    /* NAVBAR */
+    nav {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav ul li {
+      position: relative;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      background: rgba(0, 0, 0, 0.95);
+      top: 40px;
+      left: 0;
+      border-radius: 6px;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px;
+    }
+
+    /* SECTION HEADINGS */
+    .section-heading {
+      text-align: center;
+      font-size: 2rem;
+      margin: 40px 0 20px;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    /* CARD GRID */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding: 0 20px 40px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      color: #333;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+    }
+
+    .image-box {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* VIDEO OR IMAGE STYLES */
+    .image-box video,
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card .overlay-text {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 4px 8px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    .card .logo {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      border-radius: 50%;
+      background: #fff;
+      padding: 4px;
+      object-fit: contain;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .card h2 {
+      margin: 12px;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      margin: 0 12px 12px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">MyMedia</div>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li class="dropdown">
+        <a href="#">Video ▾</a>
+        <div class="dropdown-menu">
+          <a href="#">Download</a>
+          <a href="#">Upload</a>
+        </div>
+      </li>
+      <li><a href="#">Watch</a></li>
+      <li><a href="#">Contact Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- VIDEO GALLERY -->
+  <h2 class="section-heading">Video Gallery</h2>
+  <section class="card-grid" id="video-gallery">
+    <div class="card">
+      <div class="image-box">
+        <video src="video1.mp4" autoplay muted loop></video>
+        <div class="overlay-text">Nature Travel</div>
+      </div>
+      <img src="logo1.png" class="logo" />
+      <h2>Trip to Mountains</h2>
+      <p>Relax and watch mountain views.</p>
+    </div>
+    <div class="card">
+      <div class="image-box">
+        <video src="video2.mp4" autoplay muted loop></video>
+        <div class="overlay-text">City Life</div>
+      </div>
+      <img src="logo2.png" class="logo" />
+      <h2>Urban Tour</h2>
+      <p>Explore big city streets and lights.</p>
+    </div>
+  </section>
+
+  <!-- IMAGE GALLERY -->
+  <h2 class="section-heading">Image Gallery</h2>
+  <section class="card-grid" id="image-gallery">
+    <div class="card">
+      <div class="image-box">
+        <img src="image1.jpg" alt="Image 1"/>
+        <div class="overlay-text">Beach Sunset</div>
+      </div>
+      <img src="logo3.png" class="logo" />
+      <h2>Ocean Escape</h2>
+      <p>Evening vibes at the beach shore.</p>
+    </div>
+    <div class="card">
+      <div class="image-box">
+        <img src="image2.jpg" alt="Image 2"/>
+        <div class="overlay-text">Mountain Trail</div>
+      </div>
+      <img src="logo4.png" class="logo" />
+      <h2>Forest Hike</h2>
+      <p>Peaceful nature trail experience.</p>
+    </div>
+  </section>
+
+</body>
+</html>

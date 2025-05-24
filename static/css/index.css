@@ -1,0 +1,470 @@
+/* Reset & base */
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Zen Antique Soft', serif;
+    background-color: #000; /* fallback */
+  }
+  
+  .animated-background {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .animated-background::before,
+  .animated-background::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    animation: fadeSlideshow 16s infinite;
+    z-index: -1;
+    opacity: 0;
+  }
+  
+  .animated-background::before {
+    background-image: url('../img/flight-bg.jpg');
+    animation-delay: 0s;
+  }
+  
+  .animated-background::after {
+    background-image: url('../img/flight-bg2.jpg'); /* Add more variations like bg2, bg3 */
+    animation-delay: 8s;
+  }
+  
+  @keyframes fadeSlideshow {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    45% { opacity: 1; }
+    55% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .slideshow-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+  }
+  
+  .slideshow-background img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+  }
+  
+  
+  
+  /* Jets flying */
+  .jet {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    fill-opacity: 0.8;
+    animation-timing-function: linear;
+    pointer-events: none;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    transform-origin: center;
+    animation-name: flyPath, jetScale;
+    animation-duration: 12s, 4s;
+    animation-direction: normal, alternate;
+  }
+  
+  .jet1 {
+    top: 20%;
+    left: -60px;
+    animation: flyRight 12s linear infinite;
+    animation-delay: 0s;
+    fill: #231;
+  }
+  
+  .jet2 {
+    top: 40%;
+    left: -80px;
+    animation: flyRight 15s linear infinite;
+    animation-delay: 5s;
+    fill: #432;
+  }
+  
+  .jet3 {
+    top: 60%;
+    left: -100px;
+    animation: flyRight 10s linear infinite;
+    animation-delay: 3s;
+    fill: #082;
+  }
+  
+  /* Keyframes for jets flying right */
+  @keyframes flyRight {
+    0% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(110vw);
+      opacity: 0;
+    }
+  }
+  
+  /* Content overlay above background */
+  .background-overlay {
+    position: relative;
+    z-index: 10;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3); /* slight overlay for readability */
+  }
+  
+  /* Center content styling */
+  .center-content {
+    max-width: 700px;
+  }
+  
+  /* Animated glowing text for heading */
+#main-heading {
+    font-size: 4rem;
+    color: #ffffff;
+    text-shadow: 0 0 5px #00bfff, 0 0 10px #117008, 0 0 15px #ff1100;
+    animation: glowText 3s ease-in-out infinite alternate;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1.5px;
+  }
+  
+  @keyframes glowText {
+    0% {
+      text-shadow: 0 0 5px #0dd839, 0 0 10px #00bfff, 0 0 15px #0f24e2;
+      color: #ffffff;
+    }
+    100% {
+      text-shadow: 0 0 15px #9cc5e0, 0 0 25px #08e213, 0 0 35px #007acc;
+      color: #fa6f12;
+    }
+  }
+  
+  
+  /* Booking button */
+  .booking-form button {
+    font-size: 1.2rem;
+    padding: 12px 30px;
+    border: none;
+    background-color: #0099ffcc;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .booking-form button:hover {
+    background-color: #007acccc;
+  }
+  
+  /* Voice Book logo */
+  .voice-book-logo {
+    position: absolute;
+    right: 40px;
+    top: 20%;
+    transform: translateY(-50%);
+    max-width: 120px;
+    z-index: 11;
+    border-radius: 80%;
+    border:#09f33c;
+    border-width: 200px;
+  }
+  .voice-book-logo img {
+    width: 120px;               /* size */
+    height: 120px;
+    border-radius: 50%;         /* make it circular */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* soft shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    object-fit: cover;          /* keep aspect ratio and cover */
+    cursor: pointer;            /* pointer on hover */
+    
+}
+  
+  .voice-book-logo img:hover {
+    transform: scale(1.05);      /* slight zoom on hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  }
+  
+  
+  /* Navbar styling */
+  .navbar {
+    position: relative;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  
+  .nav-logo img {
+    height: 40px;
+  }
+
+
+
+
+
+  .nav-logo {
+    background-color: rgba(233, 239, 240, 0.05);
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+
+  
+  .nav-links {
+    list-style: none;
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-links li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links li a:hover {
+    color: #0099ff;
+  }
+  
+  /* Footer styling */
+  .footer {
+    position: relative;
+    z-index: 11;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .social-icons a {
+    margin: 0 8px;
+    display: inline-block;
+  }
+  
+  .social-icons img {
+    vertical-align: middle;
+  }
+  
+
+  /* Animate heading: fade in and slide down */
+@keyframes fadeSlideDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .main-heading {
+    animation: fadeSlideDown 1.2s ease forwards;
+    margin-bottom: 50px; /* more space below heading */
+  }
+  
+  /* Animate booking button: fade in with slight delay */
+  .booking-form button {
+    animation: fadeSlideDown 1.2s ease forwards;
+    animation-delay: 0.8s;
+    margin-top: 20px; /* add some vertical spacing */
+  }
+  
+  /* Footer improvements */
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    z-index: 11;
+  }
+  
+  .social-icons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .footer-info {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    color: #ccc;
+  }
+  
+  .footer-info a {
+    color: #aaddff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-info a:hover {
+    color: #66bbff;
+  }
+  
+
+ 
+
+  
+
+  /* Button style */
+.btn {
+    font-size: 1.2rem;
+    padding: 12px 30px;
+    border: none;
+    background-color: #045315cc;
+    color: white;
+    cursor: pointer;
+    border-radius: 20px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+    font-size: 2rem;
+  }
+  
+  .btn:hover {
+    background-color: #007acccc;
+  }
+  
+  /* Tooltip container */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%; /* Position above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none; /* Prevent tooltip from blocking mouse */
+  }
+  
+  /* Tooltip arrow */
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* bottom of tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+  
+  /* Show tooltip on hover */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+
+
+  /* Floating particles container */
+.particles {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 5;
+  }
+  
+  /* Single particle */
+  .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: floatParticle 6s linear infinite;
+    filter: drop-shadow(0 0 4px #00bfff);
+  }
+  
+  /* Animate each particle floating up and down with fading */
+  @keyframes floatParticle {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.3;
+    }
+  }
+
+  
+  #main-heading {
+    animation: glowText 3s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glowText {
+    0% {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 15px #00bfff;
+      color: #ffffff;
+    }
+    100% {
+      text-shadow: 0 0 15px #007acc, 0 0 25px #007acc, 0 0 35px #007acc;
+      color: #aaddff;
+    }
+  }
+
+ 
+  
+  @keyframes jetScale {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  
