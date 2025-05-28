@@ -291,13 +291,19 @@ def submit_booking():
     data = request.form
     conn = get_db_connection()
     cursor = conn.cursor()
+
     try:
+        # Safely cast numeric values
+        adults = int(data.get('adults') or 0)
+        children = int(data.get('children') or 0)
+        infants = int(data.get('infants') or 0)
+
         cursor.execute("""
             INSERT INTO bookings (
                 user_id, trip_type, from_location, to_location,
-                depart_date, return_date, adults, children, infants,
+                depart_date, return_date, flight_time, adults, children, infants,
                 class_of_travel, airline_name
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             session['user_id'],
             data.get('trip_type'),
@@ -305,12 +311,14 @@ def submit_booking():
             data.get('to_location'),
             data.get('depart_date'),
             data.get('return_date'),
-            data.get('adults'),
-            data.get('children'),
-            data.get('infants'),
+            data.get('flight_time'),
+            adults,
+            children,
+            infants,
             data.get('class_of_travel'),
             data.get('airline_name')
         ))
+
         conn.commit()
         booking_id = cursor.lastrowid
     except Exception as e:
@@ -321,8 +329,6 @@ def submit_booking():
         conn.close()
 
     return redirect(url_for('booking_confirmation', booking_id=booking_id))
-
-
 
 
 
