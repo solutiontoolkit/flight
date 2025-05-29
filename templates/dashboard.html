@@ -96,7 +96,9 @@
         .btn.logout {
             background-color: #dc3545;
         }
-
+        .btn.home {
+            background-color: green;
+        }
         .btn.small {
             padding: 6px 12px;
             font-size: 14px;
@@ -165,6 +167,7 @@
 
         <!-- Sticky Buttons -->
         <div class="action-buttons">
+            <a href="{{ url_for('home') }}" class="btn home" id="homebtn">Return Home</a>
             <a href="{{ url_for('booking') }}" class="btn" id="newBookingBtn">New Booking</a>
             <a href="{{ url_for('logout') }}" class="btn logout" id="logoutBtn">Logout</a>
         </div>

@@ -167,7 +167,6 @@ def dashboard():
     else:
         return "User not found"
     
-    
 
 
 @app.route('/booking', methods=['GET', 'POST'])
@@ -175,6 +174,7 @@ def booking():
     if 'user_id' not in session:
         return redirect(url_for('account'))
     return render_template('bookin.html')
+
 
 @app.route('/my_bookings_test')
 def my_bookings_test():

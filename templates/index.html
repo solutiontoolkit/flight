@@ -43,21 +43,32 @@
       </div>
       
     
-    <nav class="navbar">
+      <nav class="navbar">
         <div class="nav-logo">
             <img src="{{ url_for('static', filename='img/jet_logo.jpg') }}" alt="JefJet Logo">
         </div>
         <ul class="nav-links">
             <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('booking') }}">Book Now</a></li>
-            <li><a href="{{ url_for('account') }}">Account</a></li>
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('payment', booking_id=1) }}">Payment</a></li>
+    
+            {% if session.get('user_id') %}
+                <li><a href="{{ url_for('booking') }}">Book Now</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('payment', booking_id=1) }}">Payment</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('account') }}">Book Now</a></li>
+                <li><a href="{{ url_for('account') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('account') }}">Payment</a></li>
+                <li><a href="{{ url_for('account') }}">Account</a></li>
+            {% endif %}
+    
             <li><a href="{{ url_for('contact') }}">Contact</a></li>
             <li><a href="{{ url_for('gallery') }}">How to Book</a></li>
         </ul>
     </nav>
+    
 
+   
     <div class="background-overlay">
         <div class="center-content">
           <p id="main-heading" class="main-heading">
@@ -65,20 +76,24 @@
           </p>
           <form action="{{ url_for('booking') }}" method="get">
             <div class="tooltip">
-              <button type="submit" class="btn btn--stripe btn--radius">
-                PROCEED TO BOOKING
-              </button>
-              <span class="tooltiptext">
-                Click here to start your flight booking process
-              </span>
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('booking') }}" class="btn btn--stripe btn--radius">PROCEED TO BOOKING</a>
+                {% else %}
+                    <a href="{{ url_for('account') }}" class="btn btn--stripe btn--radius">LOGIN TO BOOK</a>
+                {% endif %}
+                <span class="tooltiptext">
+                    Click here to start your flight booking process
+                </span>
             </div>
+            
           </form>
         </div>
       </div>
       
-        <div class="voice-book-logo">
-            <img src="{{ url_for('static', filename='img/voice-book.jpg') }}" alt="Voice-Book Logo">
-        </div>
+      <div class="voice-book-logo" style="cursor:pointer;" id="voiceBtn" title="Click to speak your booking">
+        <img src="{{ url_for('static', filename='img/voice-book.jpg') }}" alt="Voice-Book Logo" />
+    </div>
+    
     </div>
 
     <footer class="footer">
@@ -108,6 +123,7 @@
             document.getElementById('welcome-message').style.display = 'none';
         });
     </script>
-    <script src="{{ url_for('static', filename='tooltip.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice.js') }}"></script>
 </body>
 </html>
